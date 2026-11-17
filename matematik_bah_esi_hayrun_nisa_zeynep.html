@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4A6B5D">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Matematik Bahçesi">
+    <title>Matematik Bahçesi | Hayrun Nisa & Zeynep</title>
+    
+    <!-- Dinamik PWA Manifest ve İkon Bağlantısı -->
+    <link id="manifest-link" rel="manifest" href="">
+    <link id="apple-touch-icon" rel="apple-touch-icon" href="">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Plus Jakarta Sans & Nunito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Nunito"', 'sans-serif'],
+                    },
+                    colors: {
+                        sage: {
+                            50: '#F4F7F5',
+                            100: '#E3EBE6',
+                            200: '#C6D7CD',
+                            300: '#9EBAA9',
+                            400: '#749A83',
+                            500: '#537D65',
+                            600: '#416450',
+                            700: '#355041',
+                            800: '#2C4136',
+                            900: '#25362E',
+                        },
+                        cream: {
+                            50: '#FDFCFA',
+                            100: '#FAF6F0',
+                            200: '#F3ECE0',
+                            300: '#E8DEC9',
+                        },
+                        terracotta: {
+                            400: '#E08E79',
+                            500: '#D1745D',
+                            600: '#B85C46',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FAF6F0;
+            color: #25362E;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Özel Kaydırma Çubuğu */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F4F7F5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #9EBAA9;
+            border-radius: 9999px;
+        }
+
+        /* Bitki ve Su Animasyonları */
+        @keyframes gentleSway {
+            0%, 100% { transform: rotate(-1.5deg); }
+            50% { transform: rotate(1.5deg); }
+        }
+        .plant-sway {
+            transform-origin: 100px 132px;
+            animation: gentleSway 4s ease-in-out infinite;
+        }
+
+        @keyframes dropFall {
+            0% { transform: translateY(-10px); opacity: 0; }
+            30% { opacity: 1; }
+            100% { transform: translateY(85px); opacity: 0; }
+        }
+        .animate-drop-1 { animation: dropFall 1.1s ease-in forwards; }
+        .animate-drop-2 { animation: dropFall 1.1s ease-in 0.15s forwards; }
+        .animate-drop-3 { animation: dropFall 1.1s ease-in 0.3s forwards; }
+
+        @keyframes popIn {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.2s ease-out forwards;
+        }
+
+        /* İrade Acil Durum Pulse */
+        @keyframes softPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(209, 116, 93, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(209, 116, 93, 0); }
+        }
+        .pulse-terracotta {
+            animation: softPulse 2.5s infinite;
+        }
+
+        /* Yatay kaydırmalı filtre hapları için gizli scrollbar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-sage-200 selection:text-sage-900">
+
+    <!-- Bildirim / Toast Mesaj Kutusu (alert() yerine kullanılır) -->
+    <div id="toast-container" class="fixed top-4 right-4 left-4 sm:left-auto sm:w-96 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Üst Bilgi ve PWA Kurulum Çubuğu -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-sage-200/70 sticky top-0 z-30">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+            <!-- Logo & Başlık -->
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sage-500 to-sage-700 flex items-center justify-center text-white shadow-sm">
+                    <i data-lucide="sprout" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="font-display font-extrabold text-lg sm:text-xl text-sage-900 leading-tight">Matematik Bahçesi</h1>
+                    <p class="text-xs text-sage-600 font-medium">Hayrun Nisa & Zeynep Ortak Kampı</p>
+                </div>
+            </div>
+
+            <!-- Sağ Aksiyon Butonları -->
+            <div class="flex items-center gap-2">
+                <button onclick="openModal('reminder-modal')" class="p-2.5 rounded-xl bg-sage-50 hover:bg-sage-100 text-sage-700 transition flex items-center gap-1.5 text-xs sm:text-sm font-semibold border border-sage-200/60" title="Günlük Hatırlatıcı Ayarla">
+                    <i data-lucide="bell-ring" class="w-4 h-4 text-sage-600"></i>
+                    <span class="hidden sm:inline">Hatırlatıcı</span>
+                    <span id="reminder-badge" class="w-2 h-2 rounded-full bg-terracotta-500 hidden"></span>
+                </button>
+
+                <button id="pwa-install-btn" onclick="openModal('pwa-modal')" class="p-2.5 px-3 rounded-xl bg-sage-600 hover:bg-sage-700 text-white transition flex items-center gap-1.5 text-xs sm:text-sm font-semibold shadow-sm">
+                    <i data-lucide="smartphone" class="w-4 h-4"></i>
+                    <span>Uygulamayı Kur</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Kullanıcı Seçim Sekmeleri -->
+        <div class="max-w-5xl mx-auto px-4 pb-3 pt-1">
+            <div class="bg-cream-200/80 p-1 rounded-2xl grid grid-cols-2 gap-1.5 border border-cream-300">
+                <button id="tab-nisa" onclick="switchUser('nisa')" class="py-2.5 px-4 rounded-xl font-display font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2">
+                    <span class="text-lg">🌸</span>
+                    <span>Hayrun Nisa</span>
+                    <span id="nisa-streak-pill" class="text-xs px-2 py-0.5 rounded-full bg-sage-100 text-sage-700 font-bold">0🔥</span>
+                </button>
+                <button id="tab-zeynep" onclick="switchUser('zeynep')" class="py-2.5 px-4 rounded-xl font-display font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2">
+                    <span class="text-lg">🌿</span>
+                    <span>Zeynep</span>
+                    <span id="zeynep-streak-pill" class="text-xs px-2 py-0.5 rounded-full bg-sage-100 text-sage-700 font-bold">0🔥</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Ana İçerik Alanı -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-5 space-y-6">
+
+        <!-- Ortak Bahçemiz: Hayrun Nisa & Zeynep Yan Yana Motivasyon Banner'ı -->
+        <section class="bg-gradient-to-r from-sage-800 via-sage-700 to-sage-800 rounded-3xl p-4 sm:p-5 text-white shadow-md border border-sage-600/50">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 text-sage-100 text-[11px] font-bold tracking-wide">
+                        <span>🌱 ORTAK BAHÇEMİZ</span>
+                    </div>
+                    <h2 class="font-display font-bold text-lg sm:text-xl text-cream-50">Birlikte Büyüyen İki Bitki, Tek Hedef!</h2>
+                    <p id="shared-garden-summary" class="text-xs text-sage-200">Birbirinizin ilerlemesini takip edin ve bugünkü dersinizi tamamlayıp WhatsApp'tan haber verin.</p>
+                </div>
+
+                <!-- İki Bitkinin Yan Yana Özeti -->
+                <div class="grid grid-cols-2 gap-2.5 sm:gap-3 shrink-0">
+                    <div onclick="switchUser('nisa')" class="cursor-pointer bg-white/10 hover:bg-white/15 backdrop-blur-xs rounded-2xl p-3 border border-white/15 transition flex items-center gap-2.5">
+                        <div id="banner-nisa-icon" class="w-10 h-10 rounded-xl bg-cream-100 text-sage-900 flex items-center justify-center text-xl shrink-0">🌰</div>
+                        <div class="min-w-0">
+                            <div class="text-xs font-extrabold text-white truncate">Hayrun Nisa</div>
+                            <div id="banner-nisa-stage" class="text-[11px] text-sage-200 truncate">Tohum • 0 Gün</div>
+                        </div>
+                    </div>
+
+                    <div onclick="switchUser('zeynep')" class="cursor-pointer bg-white/10 hover:bg-white/15 backdrop-blur-xs rounded-2xl p-3 border border-white/15 transition flex items-center gap-2.5">
+                        <div id="banner-zeynep-icon" class="w-10 h-10 rounded-xl bg-cream-100 text-sage-900 flex items-center justify-center text-xl shrink-0">🌿</div>
+                        <div class="min-w-0">
+                            <div class="text-xs font-extrabold text-white truncate">Zeynep</div>
+                            <div id="banner-zeynep-stage" class="text-[11px] text-sage-200 truncate">Fide • 15 Gün</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bugünün Odak Dersi & Hızlı Video Erişim Kartı -->
+        <section id="today-focus-card" class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border-2 border-sage-300/80 relative overflow-hidden">
+            <!-- JS ile aktif kullanıcının sıradaki günü ve YouTube oynatma listesi butonları basılır -->
+        </section>
+
+        <!-- Üst Kart: Dijital Bitki Büyütme Bahçesi & İrade Acil Durum -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            
+            <!-- Bitki Büyütme Kartı (7 Kolon) -->
+            <div class="lg:col-span-7 bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-sage-200/70 relative overflow-hidden flex flex-col justify-between">
+                <!-- Arka plan dekoratif daire -->
+                <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-sage-50 pointer-events-none"></div>
+                
+                <div class="flex items-start justify-between relative z-10">
+                    <div>
+                        <span id="plant-stage-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sage-100 text-sage-700 mb-2">
+                            🌰 Aşama 1: Tohum
+                        </span>
+                        <h2 id="garden-greeting" class="font-display font-extrabold text-xl sm:text-2xl text-sage-900">Nisa'nın Matematik Bahçesi</h2>
+                        <p id="garden-subtitle" class="text-xs sm:text-sm text-sage-600 mt-0.5">Her tamamladığın ders gününde bitkini sula ve büyüt!</p>
+                    </div>
+                    <div class="text-right bg-cream-100 px-3 py-2 rounded-2xl border border-cream-200">
+                        <div class="text-xs text-sage-600 font-semibold">İrade Serisi</div>
+                        <div class="font-display font-extrabold text-lg sm:text-xl text-terracotta-600 flex items-center justify-end gap-1">
+                            <span id="streak-count">0</span> <span>Gün 🔥</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Etkileşimli Bitki Görseli (SVG) & İlerleme -->
+                <div class="my-3 flex flex-col sm:flex-row items-center gap-4 relative z-10">
+                    <div class="w-44 h-44 sm:w-48 sm:h-48 rounded-3xl bg-gradient-to-b from-sage-50 to-cream-100 border border-sage-200/60 flex items-center justify-center relative shrink-0 shadow-inner">
+                        <!-- Su Damlaları Animasyon Katmanı -->
+                        <svg id="water-drops-svg" class="absolute inset-0 w-full h-full pointer-events-none hidden" viewBox="0 0 200 200">
+                            <path class="animate-drop-1" d="M75 30 C75 30 68 42 68 47 A7 7 0 0 0 82 47 C82 42 75 30 75 30 Z" fill="#38BDF8"/>
+                            <path class="animate-drop-2" d="M100 20 C100 20 93 32 93 37 A7 7 0 0 0 107 37 C107 32 100 20 100 20 Z" fill="#0EA5E9"/>
+                            <path class="animate-drop-3" d="M125 32 C125 32 118 44 118 49 A7 7 0 0 0 132 49 C132 44 125 32 125 32 Z" fill="#38BDF8"/>
+                        </svg>
+
+                        <!-- Dinamik Büyüyen Bitki SVG -->
+                        <svg id="plant-svg" class="w-40 h-40" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Saksı Gölgesi -->
+                            <ellipse cx="100" cy="186" rx="45" ry="6" fill="#E3EBE6"/>
+                            <!-- Saksı Gövdesi -->
+                            <path d="M64 142H136L128 182C127.5 184.5 125.3 186 122.8 186H77.2C74.7 186 72.5 184.5 72 182L64 142Z" fill="#D1745D"/>
+                            <path d="M64 142H136L134.5 149H65.5L64 142Z" fill="#B85C46"/>
+                            <!-- Saksı Üst Kenarı -->
+                            <rect x="58" y="132" width="84" height="12" rx="6" fill="#E08E79"/>
+                            <!-- Toprak -->
+                            <path d="M66 132C66 128 134 128 134 132H66Z" fill="#5C4033"/>
+                            
+                            <!-- Dinamik Bitki Katmanı (JS ile aşamaya göre güncellenir) -->
+                            <g id="plant-growth-layer" class="plant-sway"></g>
+                        </svg>
+                    </div>
+
+                    <!-- Sağ Taraf İstatistik & Sulama Butonu -->
+                    <div class="flex-1 w-full space-y-3">
+                        <div class="bg-sage-50/80 p-3.5 rounded-2xl border border-sage-200/60">
+                            <div class="flex justify-between text-xs font-bold text-sage-800 mb-1.5">
+                                <span id="progress-label">Toplam İlerleme</span>
+                                <span id="progress-numbers">0 / 204 Gün (%0)</span>
+                            </div>
+                            <div class="w-full h-3 bg-sage-200/70 rounded-full overflow-hidden">
+                                <div id="progress-bar" class="h-full bg-gradient-to-r from-sage-500 to-sage-600 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <p id="next-stage-hint" class="text-[11px] text-sage-600 mt-1.5">Bir sonraki bitki aşaması için ders tamamla!</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                            <button onclick="waterPlantToday()" class="sm:col-span-6 py-3.5 px-3 rounded-2xl bg-gradient-to-r from-sage-600 to-sage-700 hover:from-sage-700 hover:to-sage-800 active:scale-[0.99] text-white font-bold text-xs shadow-md shadow-sage-600/20 transition flex items-center justify-center gap-1.5">
+                                <i data-lucide="droplets" class="w-4 h-4 text-sky-200 shrink-0"></i>
+                                <span>Bitir & Sula</span>
+                            </button>
+                            <button onclick="sendPartnerCheer()" class="sm:col-span-3 py-3.5 px-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-white font-bold text-xs transition flex items-center justify-center gap-1 shadow-sm" title="Arkadaşına Canlı Motivasyon Gönder">
+                                <span>👏</span>
+                                <span>Alkışla</span>
+                            </button>
+                            <button onclick="shareWhatsAppProgress()" class="sm:col-span-3 py-3.5 px-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-xs transition flex items-center justify-center gap-1 shadow-sm" title="WhatsApp'tan İlerlemeni Paylaş">
+                                <i data-lucide="send" class="w-3.5 h-3.5 shrink-0"></i>
+                                <span>WP</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- İrade Acil Durum & Zeynep/Nisa Özel Kontrol Kartı (5 Kolon) -->
+            <div class="lg:col-span-5 flex flex-col gap-4 justify-between">
+                
+                <!-- İrade Acil Durum Kartı (5 Dakika Kuralı) -->
+                <div class="bg-gradient-to-br from-cream-100 to-orange-50/70 rounded-3xl p-5 border border-terracotta-400/30 shadow-sm flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-terracotta-600 bg-white px-2.5 py-1 rounded-full shadow-xs">
+                                <i data-lucide="heart-handshake" class="w-3.5 h-3.5"></i> İrade Destek Alanı
+                            </span>
+                            <span class="text-xs text-sage-600 font-semibold">5 Dakika Kuralı</span>
+                        </div>
+                        <h3 class="font-display font-extrabold text-lg text-sage-900">Masaya Oturmakta Zorlanıyor musun?</h3>
+                        <p class="text-xs sm:text-sm text-sage-700 mt-1 leading-relaxed">
+                            Kendini tüm videoyu bitirmeye zorlama. Sadece <strong>5 dakikalık</strong> sayacı başlat ve ilk soruyu aç. Başlamak işin yarısıdır!
+                        </p>
+                    </div>
+
+                    <div class="mt-4">
+                        <button onclick="openWillpowerModal()" class="w-full py-3 px-4 rounded-2xl bg-terracotta-500 hover:bg-terracotta-600 text-white font-display font-bold text-sm transition shadow-sm pulse-terracotta flex items-center justify-center gap-2">
+                            <i data-lucide="timer" class="w-5 h-5"></i>
+                            <span>İrade Acil Durum: 5 Dk Başlat</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Kullanıcıya Özel Hızlı Durum / Zeynep Gün Ayarı veya Nisa Kamp Geçişi -->
+                <div id="user-context-card" class="bg-white rounded-3xl p-5 border border-sage-200/70 shadow-sm">
+                    <!-- JS ile Nisa veya Zeynep'e özel dinamik içerik basılır -->
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Program Seçici & Araç Çubuğu -->
+        <section class="bg-white rounded-3xl p-4 sm:p-6 shadow-sm border border-sage-200/70 space-y-4">
+            
+            <!-- Üst Kontroller: Aşama Sekmeleri (Nisa için) & Toplu İşlem Butonları -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-sage-100">
+                
+                <!-- Aşama / Program Sekmeleri -->
+                <div id="program-tabs-container" class="flex flex-wrap items-center gap-2">
+                    <!-- JS ile doldurulacak -->
+                </div>
+
+                <!-- Sağ Araçlar: Oynatma Listesi, Toplu Yapıştır, Dışa/İçe Aktar -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <a id="active-playlist-btn" href="https://youtube.com/playlist?list=PL5_r-P6hrs22zWYRwgrMdfHsh-_Tb4n93" target="_blank" rel="noopener" class="px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold transition flex items-center gap-1.5">
+                        <i data-lucide="youtube" class="w-4 h-4 text-red-600"></i>
+                        <span>Tüm Oynatma Listesi</span>
+                    </a>
+                    <button onclick="openModal('bulk-paste-modal')" class="px-3 py-2 rounded-xl bg-sage-100 hover:bg-sage-200 text-sage-800 text-xs font-bold transition flex items-center gap-1.5">
+                        <i data-lucide="clipboard-paste" class="w-4 h-4 text-sage-700"></i>
+                        <span>Toplu Link Yapıştır</span>
+                    </button>
+                    <button onclick="openModal('sync-modal')" class="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition flex items-center gap-1.5">
+                        <span id="cloud-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Canlı Eşleşme</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ünite Filtre Hapları (175 Günlük DGS Takvimi için) -->
+            <div id="unit-filter-bar" class="hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                <!-- JS ile ünite hapları basılır -->
+            </div>
+
+            <!-- Arama, Filtreleme ve Yeni Gün Ekleme -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div class="relative flex-1">
+                    <i data-lucide="search" class="w-4 h-4 text-sage-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" id="search-input" oninput="renderSchedule()" placeholder="Konu, ünite veya gün ara (örn: Problemler, 45. Gün)..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-sage-50/70 border border-sage-200 text-sm focus:outline-none focus:ring-2 focus:ring-sage-500/30 focus:border-sage-500">
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <select id="filter-status" onchange="renderSchedule()" class="px-3 py-2.5 rounded-xl bg-sage-50/70 border border-sage-200 text-xs sm:text-sm font-semibold text-sage-800 focus:outline-none">
+                        <option value="all">Tüm Günler</option>
+                        <option value="pending">Bekleyenler</option>
+                        <option value="completed">Tamamlananlar</option>
+                    </select>
+
+                    <button onclick="addNewDayRow()" class="px-3.5 py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-xs sm:text-sm font-bold transition flex items-center gap-1.5 shrink-0">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Gün Ekle</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ders Programı Tablosu -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-sage-200 text-[11px] uppercase tracking-wider text-sage-500 font-bold">
+                            <th class="py-3 px-2 w-12 text-center">Durum</th>
+                            <th class="py-3 px-2 w-20">Gün</th>
+                            <th class="py-3 px-2">Ünite & Konu Başlığı</th>
+                            <th class="py-3 px-2 w-48 sm:w-60">Video Dersi & Arama</th>
+                            <th class="py-3 px-2 w-36 hidden md:table-cell">Not / Soru</th>
+                            <th class="py-3 px-2 w-16 text-right">Düzenle</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-tbody" class="divide-y divide-sage-100 text-sm">
+                        <!-- JS ile dinamik satırlar oluşturulur -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Boş Durum Mesajı -->
+            <div id="empty-state" class="hidden py-10 text-center space-y-2">
+                <div class="w-12 h-12 rounded-2xl bg-sage-100 text-sage-600 flex items-center justify-center mx-auto">
+                    <i data-lucide="book-open" class="w-6 h-6"></i>
+                </div>
+                <p class="font-display font-bold text-sage-800">Bu filtreye uygun gün bulunamadı.</p>
+                <p class="text-xs text-sage-500">Aramayı veya ünite filtresini temizleyebilirsiniz.</p>
+            </div>
+        </section>
+
+    <!-- 4. Zeynep & Nisa Canlı Bulut Eşleşme / Ortak Oda Modalı -->
+    <div id="sync-modal" class="fixed inset-0 bg-sage-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl border border-sage-200 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-extrabold text-lg text-sage-900">Canlı İlerleme Takibi (Nisa & Zeynep) 🌐</h3>
+                <button onclick="closeModal('sync-modal')" class="p-1.5 rounded-xl hover:bg-sage-100 text-sage-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="bg-emerald-50/90 border border-emerald-200 rounded-2xl p-3.5 space-y-1.5">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold text-emerald-900 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span id="sync-connection-label">Canlı Bulut Senkronizasyonu Aktif</span>
+                    </span>
+                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white text-emerald-700 border border-emerald-200">Otomatik</span>
+                </div>
+                <p class="text-xs text-emerald-800 leading-relaxed">
+                    İkiniz de aynı <strong>Ortak Bahçe Kodu</strong>nu kullandığınız sürece, Zeynep kendi telefonundan bir günü tamamladığında senin ekranında da anında güncellenir!
+                </p>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-xs font-bold text-sage-700">Ortak Bahçe Kodu (İkinizde de aynı olmalı):</label>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="garden-room-input" value="nisa-zeynep-ortak-bahce" class="flex-1 px-3.5 py-2.5 rounded-xl bg-sage-50 border border-sage-200 text-xs font-mono font-bold text-sage-900">
+                    <button onclick="joinGardenRoom()" class="px-4 py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-xs font-bold transition shrink-0">
+                        Odaya Bağlan
+                    </button>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                    <span class="text-[11px] text-sage-500">Bu kodu Zeynep'e göndererek aynı bahçeye bağlanmasını sağla:</span>
+                    <button onclick="copyRoomLink()" class="text-xs font-bold text-sage-700 hover:text-sage-900 underline">Davet Linkini Kopyala</button>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-sage-100 flex items-center justify-between gap-2">
+                <button onclick="downloadJSONBackup()" class="px-3.5 py-2 rounded-xl bg-cream-200 hover:bg-cream-300 text-sage-900 text-xs font-bold flex items-center gap-1.5 transition">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                    <span>Yedek İndir (JSON)</span>
+                </button>
+                <span id="last-sync-time" class="text-[11px] text-sage-500">Son eşleşme: Az önce</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Video Linki & Not Düzenleme Modalı -->
+    <div id="edit-day-modal" class="fixed inset-0 bg-sage-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl border border-sage-200 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 id="edit-modal-title" class="font-display font-extrabold text-lg text-sage-900">Gün Detaylarını Düzenle</h3>
+                <button onclick="closeModal('edit-day-modal')" class="p-1.5 rounded-xl hover:bg-sage-100 text-sage-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <input type="hidden" id="edit-day-id">
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-sage-700 mb-1">Ünite</label>
+                    <input type="text" id="edit-unit-input" class="w-full px-3.5 py-2.5 rounded-xl bg-sage-50 border border-sage-200 text-sm focus:outline-none focus:border-sage-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-sage-700 mb-1">Konu Adı</label>
+                    <input type="text" id="edit-topic-input" class="w-full px-3.5 py-2.5 rounded-xl bg-sage-50 border border-sage-200 text-sm focus:outline-none focus:border-sage-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-sage-700 mb-1">Özel YouTube Video Linki (İsteğe Bağlı)</label>
+                    <input type="url" id="edit-link-input" placeholder="Boş bırakılırsa kamp oynatma listesi kullanılır" class="w-full px-3.5 py-2.5 rounded-xl bg-sage-50 border border-sage-200 text-sm focus:outline-none focus:border-sage-500">
+                    <p class="text-[11px] text-sage-500 mt-1">O günün spesifik video linkini yapıştırırsan doğrudan o video açılır.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-sage-700 mb-1">Çözülen Soru Sayısı / Kısa Not</label>
+                    <input type="text" id="edit-note-input" placeholder="Örn: 60 soru çözüldü, tekrar edilecek" class="w-full px-3.5 py-2.5 rounded-xl bg-sage-50 border border-sage-200 text-sm focus:outline-none focus:border-sage-500">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <button onclick="closeModal('edit-day-modal')" class="px-4 py-2.5 rounded-xl bg-sage-100 text-sage-700 text-xs font-bold">Vazgeç</button>
+                <button onclick="saveDayDetails()" class="px-5 py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-xs font-bold">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Toplu Excel / Konu & Link Yapıştırma Modalı -->
+    <div id="bulk-paste-modal" class="fixed inset-0 bg-sage-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl border border-sage-200 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-extrabold text-lg text-sage-900">Toplu Konu veya Link Yapıştır</h3>
+                <button onclick="closeModal('bulk-paste-modal')" class="p-1.5 rounded-xl hover:bg-sage-100 text-sage-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-sage-600 leading-relaxed">
+                Excel'den veya PDF'ten kopyaladığın satırları aşağıya yapıştır. Her satır sırasıyla günlere eklenir veya mevcut günleri günceller. İstersen yanına <code class="bg-sage-100 px-1 rounded">| https://youtube...</code> şeklinde link de koyabilirsin.
+            </p>
+
+            <div class="space-y-3">
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-sage-700">Başlangıç Günü:</label>
+                    <input type="number" id="bulk-start-day" value="1" min="1" max="175" class="w-20 px-3 py-1.5 rounded-xl bg-sage-50 border border-sage-200 text-sm font-bold text-center">
+                </div>
+
+                <textarea id="bulk-textarea" rows="6" placeholder="Örnek:&#10;Temel Kavramlar | https://youtube.com/...&#10;Tek Çift Sayılar | https://youtube.com/..." class="w-full p-3.5 rounded-2xl bg-sage-50 border border-sage-200 text-xs font-mono focus:outline-none focus:border-sage-500"></textarea>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-end gap-2 pt-1">
+                <button onclick="pasteOnlyLinksMode()" class="px-4 py-2.5 rounded-xl bg-cream-200 hover:bg-cream-300 text-sage-900 text-xs font-bold transition">
+                    Sadece Linkleri Eşleştir
+                </button>
+                <button onclick="processBulkPaste()" class="px-5 py-2.5 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-xs font-bold transition">
+                    Satırları Programa Aktar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Zeynep & Nisa Paylaşım / Yedekleme Modalı -->
+    <div id="sync-modal" class="fixed inset-0 bg-sage-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl border border-sage-200 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-extrabold text-lg text-sage-900">Zeynep ile Paylaş & Yedekle</h3>
+                <button onclick="closeModal('sync-modal')" class="p-1.5 rounded-xl hover:bg-sage-100 text-sage-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-sage-600 leading-relaxed">
+                Video linklerini veya kendi çalışma planını tek tıkla kopyalayıp WhatsApp'tan Zeynep'e gönderebilir, ya da onun gönderdiği kodu buraya yapıştırıp yükleyebilirsin.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <button onclick="copyShareCode()" class="p-3.5 rounded-2xl bg-sage-600 hover:bg-sage-700 text-white text-xs font-bold flex items-center justify-center gap-2 transition">
+                    <i data-lucide="copy" class="w-4 h-4"></i>
+                    <span>Paylaşım Kodunu Kopyala</span>
+                </button>
+                <button onclick="downloadJSONBackup()" class="p-3.5 rounded-2xl bg-cream-200 hover:bg-cream-300 text-sage-900 text-xs font-bold flex items-center justify-center gap-2 transition">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>JSON Dosyası İndir</span>
+                </button>
+            </div>
+
+            <div class="pt-2 border-t border-sage-100 space-y-2">
+                <label class="block text-xs font-bold text-sage-700">Zeynep'ten Gelen Kodu Buraya Yapıştır:</label>
+                <textarea id="import-code-input" rows="3" placeholder="Paylaşım kodunu buraya yapıştırın..." class="w-full p-3 rounded-xl bg-sage-50 border border-sage-200 text-xs font-mono"></textarea>
+                <button onclick="importShareCode()" class="w-full py-2.5 rounded-xl bg-sage-800 hover:bg-sage-900 text-white text-xs font-bold transition">
+                    Kodu Yükle ve Güncelle
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Günlük Bildirim & Hatırlatıcı Modalı -->
+    <div id="reminder-modal" class="fixed inset-0 bg-sage-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl border border-sage-200 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-extrabold text-lg text-sage-900">Günlük Çalışma Hatırlatıcısı</h3>
+                <button onclick="closeModal('reminder-modal')" class="p-1.5 rounded-xl hover:bg-sage-100 text-sage-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="bg-sage-50 p-4 rounded-2xl border border-sage-200/70 space-y-3">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-bold text-sage-800">Hatırlatma Saati:</label>
+                    <input type="time" id="reminder-time-input" value="18:00" class="px-3 py-1.5 rounded-xl bg-white border border-sage-300 text-sm font-bold text-sage-900">
+                </div>
+
+                <button onclick="enableBrowserNotification()" class="w-full py-2.5 px-4 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-xs font-bold flex items-center justify-center gap-2 transition">
+                    <i data-lucide="bell" class="w-4 h-4"></i>
+                    <span>Uygulama Bildirimini Aç & Test Et</span>
+                </button>
+            </div>
+
+            <div class="bg-cream-100 p-4 rounded-2xl border border-cream-300 space-y-2">
+                <div class="flex items-center gap-2 text-xs font-extrabold text-sage-900">
+                    <i data-lucide="calendar-check" class="w-4 h-4 text-terracotta-600"></i>
+                    <span>Kesin Çözüm: Telefon Takvimi Alarmı</span>
+                </div>
+                <p class="text-[11px] text-sage-700 leading-relaxed">
+                    Tarayıcı kapalıyken bile telefonunun her gün belirlediğin saatte çalması için iPhone veya Android takvimine günlük alarm ekle:
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <a id="gcal-reminder-link" href="#" target="_blank" rel="noopener" class="py-2.5 px-3 rounded-xl bg-white hover:bg-cream-200 text-sage-900 border border-sage-300 text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-2xs">
+                        <i data-lucide="external-link" class="w-3.5 h-3.5 text-sage-600"></i>
+                        <span>Google Takvim</span>
+                    </a>
+                    <button onclick="downloadICSAlarm()" class="py-2.5 px-3 rounded-xl bg-sage-800 hover:bg-sage-900 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-2xs">
+                        <i data-lucide="download" class="w-3.5 h-3.5 text-sage-200"></i>
+                        <span>Takvim Dosyası (.ics)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. PWA Telefona Kurulum Rehberi Modalı -->
+    <div id="pwa-modal" class="fixed inset-0 bg-sage-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl border border-sage-200 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-extrabold text-lg text-sage-900">Telefonuna Uygulama Gibi Kur 📲</h3>
+                <button onclick="closeModal('pwa-modal')" class="p-1.5 rounded-xl hover:bg-sage-100 text-sage-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-sage-600 leading-relaxed">
+                Bu sayfayı GitHub Pages veya herhangi bir linkten açtığında telefonunun ana ekranına gerçek bir uygulama gibi ekleyebilirsin:
+            </p>
+
+            <div class="space-y-3 text-xs">
+                <div class="p-3.5 rounded-2xl bg-sage-50 border border-sage-200">
+                    <div class="font-extrabold text-sage-900 mb-1 flex items-center gap-1.5">
+                        <span>🤖 Android (Chrome):</span>
+                    </div>
+                    <p class="text-sage-700">Sağ üstteki <strong>üç nokta (⋮)</strong> menüsüne dokun ve <strong>"Ana ekrana ekle"</strong> veya <strong>"Uygulamayı yükle"</strong> seçeneğine bas.</p>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-cream-100 border border-cream-300">
+                    <div class="font-extrabold text-sage-900 mb-1 flex items-center gap-1.5">
+                        <span>🍎 iPhone / iPad (Safari):</span>
+                    </div>
+                    <p class="text-sage-700">Alt menüdeki <strong>Paylaş (yukarı ok)</strong> simgesine dokun, aşağı kaydırıp <strong>"Ana Ekrana Ekle"</strong> butonuna bas.</p>
+                </div>
+            </div>
+
+            <button id="native-install-trigger" onclick="triggerNativePWAInstall()" class="hidden w-full py-3 rounded-2xl bg-sage-600 text-white font-display font-bold text-sm">
+                Şimdi Otomatik Yükle
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT UYGULAMA MANTIĞI ==================== -->
+    <script>
+        // --- 1. SABİT YOUTUBE OYNATMA LİSTELERİ VE EKSİKSİZ EXCEL VERİLERİ ---
+        const PLAYLIST_CAMP_15 = 'https://youtube.com/playlist?list=PL5_r-P6hrs22zWYRwgrMdfHsh-_Tb4n93';
+        const PLAYLIST_MAIN_175 = 'https://youtube.com/playlist?list=PLYsdts948N8E';
+
+        // 15 Günlük Temel Kamp (29 Günlük Tam Excel Listesi: 15 günlük matematik.xlsx)
+        const RAW_CAMP_29_DATA = [
+            { day: 1, unit: 'Temel Kamp', topic: 'Toplama Çıkarma' },
+            { day: 2, unit: 'Temel Kamp', topic: 'Çarpma Bölme' },
+            { day: 3, unit: 'Temel Kamp', topic: 'İşlem Önceliği' },
+            { day: 4, unit: 'Temel Kamp', topic: 'Harfli İfadeler' },
+            { day: 5, unit: 'Temel Kamp', topic: 'Basit Denklemler' },
+            { day: 6, unit: 'Temel Kamp', topic: 'Rasyonel Sayılar-I' },
+            { day: 7, unit: 'Temel Kamp', topic: 'Rasyonel Sayılar-II' },
+            { day: 8, unit: 'Temel Kamp', topic: 'Ondalık Sayılar' },
+            { day: 9, unit: 'Temel Kamp', topic: 'Doğal ve Tam Sayılar' },
+            { day: 10, unit: 'Temel Kamp', topic: 'Tek ve Çift Sayılar' },
+            { day: 11, unit: 'Temel Kamp', topic: 'Asal Sayılar' },
+            { day: 12, unit: 'Temel Kamp', topic: 'Bölme Bölünebilme-I' },
+            { day: 13, unit: 'Temel Kamp', topic: 'Bölme Bölünebilme-II' },
+            { day: 14, unit: 'Temel Kamp', topic: 'Ebob Ekok-I' },
+            { day: 15, unit: 'Temel Kamp', topic: 'Ebob Ekok-II' },
+            { day: 16, unit: 'Temel Kamp', topic: 'Birinci Dereceden Denklemler- I' },
+            { day: 17, unit: 'Temel Kamp', topic: 'Birinci Dereceden Denklemler- II' },
+            { day: 18, unit: 'Temel Kamp', topic: 'Rasyonel Denklemler' },
+            { day: 19, unit: 'Temel Kamp', topic: 'Oran Orantı-I' },
+            { day: 20, unit: 'Temel Kamp', topic: 'Oran Orantı-II' },
+            { day: 21, unit: 'Temel Kamp', topic: 'Basit Eşitsizlikler-I' },
+            { day: 22, unit: 'Temel Kamp', topic: 'Basit Eşitsizlikler-II' },
+            { day: 23, unit: 'Temel Kamp', topic: 'Mutlak Değer-I' },
+            { day: 24, unit: 'Temel Kamp', topic: 'Mutlak Değer-II' },
+            { day: 25, unit: 'Temel Kamp', topic: 'Üslü İfadeler-I' },
+            { day: 26, unit: 'Temel Kamp', topic: 'Üslü İfadeler-II' },
+            { day: 27, unit: 'Temel Kamp', topic: 'Köklü İfadeler-I' },
+            { day: 28, unit: 'Temel Kamp', topic: 'Köklü İfadeler-II' },
+            { day: 29, unit: 'Temel Kamp', topic: 'Çarpanlara Ayırma-I' }
+        ];
+
+        // 175 Günlük DGS Takvimi (175_Gunluk_DGS_Takvimi.xlsx - Eksiksiz 175 Gün)
+        const RAW_DGS_175_DATA = [
+            {"Gün": 1, "Ünite": "Sayılar", "Konu": "Temel Kavramlar"},
+            {"Gün": 2, "Ünite": "Sayılar", "Konu": "Temel Kavramlar"},
+            {"Gün": 3, "Ünite": "Sayılar", "Konu": "Temel Kavramlar"},
+            {"Gün": 4, "Ünite": "Sayılar", "Konu": "Temel Kavramlar"},
+            {"Gün": 5, "Ünite": "Sayılar", "Konu": "Tek Çift Sayılar"},
+            {"Gün": 6, "Ünite": "Sayılar", "Konu": "Tek Çift Sayılar"},
+            {"Gün": 7, "Ünite": "Sayılar", "Konu": "Tek Çift Sayılar"},
+            {"Gün": 8, "Ünite": "Sayılar", "Konu": "Pozitif ve Negatif Sayılar"},
+            {"Gün": 9, "Ünite": "Sayılar", "Konu": "Pozitif ve Negatif Sayılar"},
+            {"Gün": 10, "Ünite": "Sayılar", "Konu": "Ardışık Sayılar"},
+            {"Gün": 11, "Ünite": "Sayılar", "Konu": "Ardışık Sayılar"},
+            {"Gün": 12, "Ünite": "Sayılar", "Konu": "Ardışık Sayılar"},
+            {"Gün": 13, "Ünite": "Sayılar", "Konu": "Ardışık Sayılar"},
+            {"Gün": 14, "Ünite": "Sayılar", "Konu": "Genel Tekrar"},
+            {"Gün": 15, "Ünite": "Sayılar", "Konu": "Genel Tekrar"},
+            {"Gün": 16, "Ünite": "Sayılar", "Konu": "Sayı Bas. Çözümleme"},
+            {"Gün": 17, "Ünite": "Sayılar", "Konu": "Sayı Bas. Çözümleme"},
+            {"Gün": 18, "Ünite": "Sayılar", "Konu": "Sayı Bas. Çözümleme"},
+            {"Gün": 19, "Ünite": "Sayılar", "Konu": "Sayı Bas. Çözümleme"},
+            {"Gün": 20, "Ünite": "Sayılar", "Konu": "Dört İşlem"},
+            {"Gün": 21, "Ünite": "Sayılar", "Konu": "Dört İşlem"},
+            {"Gün": 22, "Ünite": "Sayılar", "Konu": "Dört İşlem"},
+            {"Gün": 23, "Ünite": "Sayılar", "Konu": "Bölünebilme Kuralları"},
+            {"Gün": 24, "Ünite": "Sayılar", "Konu": "Bölünebilme Kuralları"},
+            {"Gün": 25, "Ünite": "Sayılar", "Konu": "Bölünebilme Kuralları"},
+            {"Gün": 26, "Ünite": "Sayılar", "Konu": "Bölünebilme Kuralları"},
+            {"Gün": 27, "Ünite": "Sayılar", "Konu": "Genel Tekrar"},
+            {"Gün": 28, "Ünite": "Sayılar", "Konu": "Genel Tekrar"},
+            {"Gün": 29, "Ünite": "Sayılar", "Konu": "Faktöriyel"},
+            {"Gün": 30, "Ünite": "Sayılar", "Konu": "Faktöriyel"},
+            {"Gün": 31, "Ünite": "Sayılar", "Konu": "Faktöriyel"},
+            {"Gün": 32, "Ünite": "Sayılar", "Konu": "Asal Sayılar"},
+            {"Gün": 33, "Ünite": "Sayılar", "Konu": "Asal Sayılar"},
+            {"Gün": 34, "Ünite": "Sayılar", "Konu": "Asal Sayılar"},
+            {"Gün": 35, "Ünite": "Sayılar", "Konu": "Asal Sayılar"},
+            {"Gün": 36, "Ünite": "Sayılar", "Konu": "OBEB - OKEK"},
+            {"Gün": 37, "Ünite": "Sayılar", "Konu": "OBEB - OKEK"},
+            {"Gün": 38, "Ünite": "Sayılar", "Konu": "OBEB - OKEK"},
+            {"Gün": 39, "Ünite": "Sayılar", "Konu": "Genel Tekrar"},
+            {"Gün": 40, "Ünite": "Sayılar", "Konu": "Genel Tekrar"},
+            {"Gün": 41, "Ünite": "Sayılar", "Konu": "Genel Tekrar"},
+            {"Gün": 42, "Ünite": "İşlem Yetenek", "Konu": "Basit Eşitsizlikler"},
+            {"Gün": 43, "Ünite": "İşlem Yetenek", "Konu": "Basit Eşitsizlikler"},
+            {"Gün": 44, "Ünite": "İşlem Yetenek", "Konu": "Basit Eşitsizlikler"},
+            {"Gün": 45, "Ünite": "İşlem Yetenek", "Konu": "Basit Eşitsizlikler"},
+            {"Gün": 46, "Ünite": "İşlem Yetenek", "Konu": "Basit Eşitsizlikler"},
+            {"Gün": 47, "Ünite": "İşlem Yetenek", "Konu": "Mutlak Değer"},
+            {"Gün": 48, "Ünite": "İşlem Yetenek", "Konu": "Mutlak Değer"},
+            {"Gün": 49, "Ünite": "İşlem Yetenek", "Konu": "Mutlak Değer"},
+            {"Gün": 50, "Ünite": "İşlem Yetenek", "Konu": "Mutlak Değer"},
+            {"Gün": 51, "Ünite": "İşlem Yetenek", "Konu": "Mutlak Değer"},
+            {"Gün": 52, "Ünite": "İşlem Yetenek", "Konu": "Rasyonel Sayılar"},
+            {"Gün": 53, "Ünite": "İşlem Yetenek", "Konu": "Rasyonel Sayılar"},
+            {"Gün": 54, "Ünite": "İşlem Yetenek", "Konu": "Rasyonel Sayılar"},
+            {"Gün": 55, "Ünite": "İşlem Yetenek", "Konu": "Rasyonel Sayılar"},
+            {"Gün": 56, "Ünite": "İşlem Yetenek", "Konu": "Üslü Sayılar"},
+            {"Gün": 57, "Ünite": "İşlem Yetenek", "Konu": "Üslü Sayılar"},
+            {"Gün": 58, "Ünite": "İşlem Yetenek", "Konu": "Üslü Sayılar"},
+            {"Gün": 59, "Ünite": "İşlem Yetenek", "Konu": "Üslü Sayılar"},
+            {"Gün": 60, "Ünite": "İşlem Yetenek", "Konu": "Genel Tekrar"},
+            {"Gün": 61, "Ünite": "İşlem Yetenek", "Konu": "Köklü Sayılar"},
+            {"Gün": 62, "Ünite": "İşlem Yetenek", "Konu": "Köklü Sayılar"},
+            {"Gün": 63, "Ünite": "İşlem Yetenek", "Konu": "Köklü Sayılar"},
+            {"Gün": 64, "Ünite": "İşlem Yetenek", "Konu": "Köklü Sayılar"},
+            {"Gün": 65, "Ünite": "İşlem Yetenek", "Konu": "Köklü Sayılar"},
+            {"Gün": 66, "Ünite": "İşlem Yetenek", "Konu": "Çarpanlara Ayırma"},
+            {"Gün": 67, "Ünite": "İşlem Yetenek", "Konu": "Çarpanlara Ayırma"},
+            {"Gün": 68, "Ünite": "İşlem Yetenek", "Konu": "Çarpanlara Ayırma"},
+            {"Gün": 69, "Ünite": "İşlem Yetenek", "Konu": "Çarpanlara Ayırma"},
+            {"Gün": 70, "Ünite": "İşlem Yetenek", "Konu": "Çarpanlara Ayırma"},
+            {"Gün": 71, "Ünite": "İşlem Yetenek", "Konu": "Genel Tekrar"},
+            {"Gün": 72, "Ünite": "İşlem Yetenek", "Konu": "Genel Tekrar"},
+            {"Gün": 73, "Ünite": "İşlem Yetenek", "Konu": "1. Dereceden Denklemler"},
+            {"Gün": 74, "Ünite": "İşlem Yetenek", "Konu": "1. Dereceden Denklemler"},
+            {"Gün": 75, "Ünite": "İşlem Yetenek", "Konu": "1. Dereceden Denklemler"},
+            {"Gün": 76, "Ünite": "İşlem Yetenek", "Konu": "1. Dereceden Denklemler"},
+            {"Gün": 77, "Ünite": "İşlem Yetenek", "Konu": "Oran Orantı"},
+            {"Gün": 78, "Ünite": "İşlem Yetenek", "Konu": "Oran Orantı"},
+            {"Gün": 79, "Ünite": "İşlem Yetenek", "Konu": "Oran Orantı"},
+            {"Gün": 80, "Ünite": "İşlem Yetenek", "Konu": "Oran Orantı"},
+            {"Gün": 81, "Ünite": "İşlem Yetenek", "Konu": "Oran Orantı"},
+            {"Gün": 82, "Ünite": "İşlem Yetenek", "Konu": "Genel Tekrar"},
+            {"Gün": 83, "Ünite": "İşlem Yetenek", "Konu": "Genel Tekrar"},
+            {"Gün": 84, "Ünite": "İşlem Yetenek", "Konu": "Genel Tekrar"},
+            {"Gün": 85, "Ünite": "İşlem Yetenek", "Konu": "Genel Tekrar"},
+            {"Gün": 86, "Ünite": "Problemler", "Konu": "Sayı Problemleri"},
+            {"Gün": 87, "Ünite": "Problemler", "Konu": "Sayı Problemleri"},
+            {"Gün": 88, "Ünite": "Problemler", "Konu": "Sayı Problemleri"},
+            {"Gün": 89, "Ünite": "Problemler", "Konu": "Sayı Problemleri"},
+            {"Gün": 90, "Ünite": "Problemler", "Konu": "Sayı Problemleri"},
+            {"Gün": 91, "Ünite": "Problemler", "Konu": "Sayı Problemleri"},
+            {"Gün": 92, "Ünite": "Problemler", "Konu": "Sayı Problemleri"},
+            {"Gün": 93, "Ünite": "Problemler", "Konu": "Sayı Problemleri"},
+            {"Gün": 94, "Ünite": "Problemler", "Konu": "Sayı Problemleri"},
+            {"Gün": 95, "Ünite": "Problemler", "Konu": "Sayı Problemleri"},
+            {"Gün": 96, "Ünite": "Problemler", "Konu": "Sayı Problemleri"},
+            {"Gün": 97, "Ünite": "Problemler", "Konu": "Sayı Problemleri"},
+            {"Gün": 98, "Ünite": "Problemler", "Konu": "Sayı Problemleri"},
+            {"Gün": 99, "Ünite": "Problemler", "Konu": "Kesir Problemleri"},
+            {"Gün": 100, "Ünite": "Problemler", "Konu": "Kesir Problemleri"},
+            {"Gün": 101, "Ünite": "Problemler", "Konu": "Kesir Problemleri"},
+            {"Gün": 102, "Ünite": "Problemler", "Konu": "Kesir Problemleri"},
+            {"Gün": 103, "Ünite": "Problemler", "Konu": "Genel Tekrar"},
+            {"Gün": 104, "Ünite": "Problemler", "Konu": "Genel Tekrar"},
+            {"Gün": 105, "Ünite": "Problemler", "Konu": "Yaş Problemleri"},
+            {"Gün": 106, "Ünite": "Problemler", "Konu": "Yaş Problemleri"},
+            {"Gün": 107, "Ünite": "Problemler", "Konu": "Yaş Problemleri"},
+            {"Gün": 108, "Ünite": "Problemler", "Konu": "Yaş Problemleri"},
+            {"Gün": 109, "Ünite": "Problemler", "Konu": "Yüzde Kâr Zarar Probl."},
+            {"Gün": 110, "Ünite": "Problemler", "Konu": "Yüzde Kâr Zarar Probl."},
+            {"Gün": 111, "Ünite": "Problemler", "Konu": "Yüzde Kâr Zarar Probl."},
+            {"Gün": 112, "Ünite": "Problemler", "Konu": "Yüzde Kâr Zarar Probl."},
+            {"Gün": 113, "Ünite": "Problemler", "Konu": "Yüzde Kâr Zarar Probl."},
+            {"Gün": 114, "Ünite": "Problemler", "Konu": "Genel Tekrar"},
+            {"Gün": 115, "Ünite": "Problemler", "Konu": "Genel Tekrar"},
+            {"Gün": 116, "Ünite": "Problemler", "Konu": "Genel Tekrar"},
+            {"Gün": 117, "Ünite": "Problemler", "Konu": "Karışım Problemleri"},
+            {"Gün": 118, "Ünite": "Problemler", "Konu": "Karışım Problemleri"},
+            {"Gün": 119, "Ünite": "Problemler", "Konu": "Hareket (Hız) Problemleri"},
+            {"Gün": 120, "Ünite": "Problemler", "Konu": "Hareket (Hız) Problemleri"},
+            {"Gün": 121, "Ünite": "Problemler", "Konu": "Hareket (Hız) Problemleri"},
+            {"Gün": 122, "Ünite": "Problemler", "Konu": "Hareket (Hız) Problemleri"},
+            {"Gün": 123, "Ünite": "Problemler", "Konu": "Hareket (Hız) Problemleri"},
+            {"Gün": 124, "Ünite": "Problemler", "Konu": "Hareket (Hız) Problemleri"},
+            {"Gün": 125, "Ünite": "Problemler", "Konu": "Genel Tekrar"},
+            {"Gün": 126, "Ünite": "Problemler", "Konu": "Genel Tekrar"},
+            {"Gün": 127, "Ünite": "Problemler", "Konu": "Genel Tekrar"},
+            {"Gün": 128, "Ünite": "Problemler", "Konu": "İşçi (Emek) Problemleri"},
+            {"Gün": 129, "Ünite": "Problemler", "Konu": "İşçi (Emek) Problemleri"},
+            {"Gün": 130, "Ünite": "Problemler", "Konu": "İşçi (Emek) Problemleri"},
+            {"Gün": 131, "Ünite": "Problemler", "Konu": "Grafik Tablo Problemleri"},
+            {"Gün": 132, "Ünite": "Problemler", "Konu": "Grafik Tablo Problemleri"},
+            {"Gün": 133, "Ünite": "Problemler", "Konu": "Grafik Tablo Problemleri"},
+            {"Gün": 134, "Ünite": "Problemler", "Konu": "Grafik Tablo Problemleri"},
+            {"Gün": 135, "Ünite": "Problemler", "Konu": "Grafik Tablo Problemleri"},
+            {"Gün": 136, "Ünite": "Problemler", "Konu": "Grafik Tablo Problemleri"},
+            {"Gün": 137, "Ünite": "Problemler", "Konu": "Grafik Tablo Problemleri"},
+            {"Gün": 138, "Ünite": "Problemler", "Konu": "Genel Tekrar"},
+            {"Gün": 139, "Ünite": "Problemler", "Konu": "Genel Tekrar"},
+            {"Gün": 140, "Ünite": "Problemler", "Konu": "Genel Tekrar"},
+            {"Gün": 141, "Ünite": "Sayısal Yetenek", "Konu": "Kümeler"},
+            {"Gün": 142, "Ünite": "Sayısal Yetenek", "Konu": "Kümeler"},
+            {"Gün": 143, "Ünite": "Sayısal Yetenek", "Konu": "Kümeler"},
+            {"Gün": 144, "Ünite": "Sayısal Yetenek", "Konu": "Kümeler"},
+            {"Gün": 145, "Ünite": "Sayısal Yetenek", "Konu": "Kümeler"},
+            {"Gün": 146, "Ünite": "Sayısal Yetenek", "Konu": "Kümeler"},
+            {"Gün": 147, "Ünite": "Sayısal Yetenek", "Konu": "Permütasyon"},
+            {"Gün": 148, "Ünite": "Sayısal Yetenek", "Konu": "Permütasyon"},
+            {"Gün": 149, "Ünite": "Sayısal Yetenek", "Konu": "Permütasyon"},
+            {"Gün": 150, "Ünite": "Sayısal Yetenek", "Konu": "Kombinasyon"},
+            {"Gün": 151, "Ünite": "Sayısal Yetenek", "Konu": "Kombinasyon"},
+            {"Gün": 152, "Ünite": "Sayısal Yetenek", "Konu": "Kombinasyon"},
+            {"Gün": 153, "Ünite": "Sayısal Yetenek", "Konu": "Olasılık"},
+            {"Gün": 154, "Ünite": "Sayısal Yetenek", "Konu": "Olasılık"},
+            {"Gün": 155, "Ünite": "Sayısal Yetenek", "Konu": "Olasılık"},
+            {"Gün": 156, "Ünite": "Sayısal Yetenek", "Konu": "Olasılık"},
+            {"Gün": 157, "Ünite": "Sayısal Yetenek", "Konu": "Olasılık"},
+            {"Gün": 158, "Ünite": "Sayısal Yetenek", "Konu": "Genel Tekrar"},
+            {"Gün": 159, "Ünite": "Sayısal Yetenek", "Konu": "Genel Tekrar"},
+            {"Gün": 160, "Ünite": "Sayısal Yetenek", "Konu": "Fonksiyonlar"},
+            {"Gün": 161, "Ünite": "Sayısal Yetenek", "Konu": "Fonksiyonlar"},
+            {"Gün": 162, "Ünite": "Sayısal Yetenek", "Konu": "Fonksiyonlar"},
+            {"Gün": 163, "Ünite": "Sayısal Yetenek", "Konu": "Fonksiyonlar"},
+            {"Gün": 164, "Ünite": "Sayısal Yetenek", "Konu": "Fonksiyonlar"},
+            {"Gün": 165, "Ünite": "Sayısal Yetenek", "Konu": "Fonksiyonlar"},
+            {"Gün": 166, "Ünite": "Sayısal Yetenek", "Konu": "İşlem"},
+            {"Gün": 167, "Ünite": "Sayısal Yetenek", "Konu": "İşlem"},
+            {"Gün": 168, "Ünite": "Sayısal Yetenek", "Konu": "İşlem"},
+            {"Gün": 169, "Ünite": "Sayısal Yetenek", "Konu": "Modüler Aritmetik"},
+            {"Gün": 170, "Ünite": "Sayısal Yetenek", "Konu": "Modüler Aritmetik"},
+            {"Gün": 171, "Ünite": "Sayısal Mantık & Geometri", "Konu": "Genel Deneme ve Geometri Çalışması"},
+            {"Gün": 172, "Ünite": "Sayısal Mantık & Geometri", "Konu": "Genel Deneme ve Geometri Çalışması"},
+            {"Gün": 173, "Ünite": "Sayısal Mantık & Geometri", "Konu": "Genel Deneme ve Geometri Çalışması"},
+            {"Gün": 174, "Ünite": "Sayısal Mantık & Geometri", "Konu": "Genel Deneme ve Geometri Çalışması"},
+            {"Gün": 175, "Ünite": "Sayısal Mantık & Geometri", "Konu": "Genel Deneme ve Geometri Çalışması"}
+        ];
+
+        function buildDefaultCamp29() {
+            return RAW_CAMP_29_DATA.map(item => ({
+                id: `c${item.day}`,
+                day: item.day,
+                unit: item.unit,
+                topic: item.topic,
+                link: '',
+                note: '',
+                completed: false
+            }));
+        }
+
+        function buildDefaultMain175(completedUpTo = 0) {
+            return RAW_DGS_175_DATA.map(row => ({
+                id: `m${row["Gün"]}`,
+                day: row["Gün"],
+                unit: row["Ünite"],
+                topic: row["Konu"],
+                link: '',
+                note: '',
+                completed: row["Gün"] <= completedUpTo
+            }));
+        }
+
+        const MOTIVATION_QUOTES = [
+            "Sadece videoyu aç ve ilk 5 dakikayı izle. 5 dakika dolduğunda istersen bırakabilirsin ama beyin başladığı işi sürdürmeyi sever!",
+            "Mükemmel olmasına gerek yok, bugün sadece masaya oturmuş olman bile iradeni güçlendirir. 🌱",
+            "Zeynep ile aynı hedefe yürüyorsunuz! Bugün suladığın her gün bahçende yeni bir yaprak açtırır.",
+            "Zor gelen konu aslında henüz alışmadığın konudur. 5 dakika sabret, zihnin ısınacak!",
+            "Bir soru bile çözsen dün olduğundan bir adım ileridesin. Haydi kronometreye odaklan!"
+        ];
+
+        // --- 2. UYGULAMA DURUMU (STATE) ---
+        const STORAGE_KEY = 'matematik_bahcesi_v3_cloud';
+        const ROOM_STORAGE_KEY = 'matematik_bahcesi_room_id';
+        let selectedUnitFilter = 'Tümü';
+        let currentRoomId = 'nisa-zeynep-ortak-bahce';
+        let cloudSyncReady = false;
+        let isApplyingRemoteUpdate = false;
+        let lastSeenCheerId = null;
+
+        let appState = {
+            activeUser: 'nisa', // 'nisa' veya 'zeynep'
+            reminderTime: '18:00',
+            reminderEnabled: false,
+            lastNotifiedDate: '',
+            latestCheer: null,
+            users: {
+                nisa: {
+                    name: 'Hayrun Nisa',
+                    activeStage: 'camp15', // 'camp15' veya 'main175'
+                    streak: 0,
+                    lastWateredDate: null,
+                    camp15: buildDefaultCamp29(),
+                    main175: buildDefaultMain175(0)
+                },
+                zeynep: {
+                    name: 'Zeynep',
+                    activeStage: 'main175',
+                    streak: 3,
+                    lastWateredDate: null,
+                    currentDayOffset: 16, // Zeynep programa önden başladı
+                    main175: buildDefaultMain175(15)
+                }
+            }
+        };
+
+        // --- 3. CANLI BULUT SENKRONİZASYONU & YEREL ÖNBELLEK ---
+        function resolveInitialRoomId() {
+            const params = new URLSearchParams(window.location.search);
+            const urlRoom = params.get('bahce');
+            if (urlRoom && urlRoom.trim()) {
+                currentRoomId = urlRoom.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '');
+                localStorage.setItem(ROOM_STORAGE_KEY, currentRoomId);
+            } else {
+                const savedRoom = localStorage.getItem(ROOM_STORAGE_KEY);
+                if (savedRoom) currentRoomId = savedRoom;
+            }
+        }
+
+        function loadState() {
+            resolveInitialRoomId();
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY + '_' + currentRoomId);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.users) appState.users = parsed.users;
+                    if (parsed.activeUser) appState.activeUser = parsed.activeUser;
+                    if (parsed.reminderTime) appState.reminderTime = parsed.reminderTime;
+                    if (typeof parsed.reminderEnabled === 'boolean') appState.reminderEnabled = parsed.reminderEnabled;
+                }
+            } catch (e) {
+                console.error("Veri yüklenirken hata oluştu:", e);
+            }
+        }
+
+        function saveState(pushToCloud = true) {
+            try {
+                localStorage.setItem(STORAGE_KEY + '_' + currentRoomId, JSON.stringify(appState));
+                updateHeaderBadges();
+                if (pushToCloud && !isApplyingRemoteUpdate && window.pushGardenToCloud) {
+                    window.pushGardenToCloud();
+                }
+            } catch (e) {
+                console.error("Veri kaydedilirken hata oluştu:", e);
+            }
+        }
+
+        function sendPartnerCheer() {
+            const sender = appState.users[appState.activeUser].name;
+            const partnerName = appState.activeUser === 'nisa' ? 'Zeynep' : 'Hayrun Nisa';
+            const cheerId = `${Date.now()}_${appState.activeUser}`;
+            lastSeenCheerId = cheerId;
+            appState.latestCheer = {
+                id: cheerId,
+                from: sender,
+                message: `${sender} sana bahçeden alkış ve motivasyon gönderdi! Haydi bugün de harika gidiyorsun! 👏🌱`
+            };
+            saveState(true);
+            showToast(`${partnerName}'e canlı motivasyon alkışı gönderildi! 👏✨`);
+        }
+
+        function joinGardenRoom() {
+            const input = document.getElementById('garden-room-input');
+            const cleanRoom = input.value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '');
+            if (!cleanRoom) {
+                showToast('Lütfen geçerli bir ortak bahçe kodu girin.', 'warning');
+                return;
+            }
+            currentRoomId = cleanRoom;
+            localStorage.setItem(ROOM_STORAGE_KEY, currentRoomId);
+            if (window.subscribeGardenCloud) {
+                window.subscribeGardenCloud(currentRoomId);
+            }
+            closeModal('sync-modal');
+            showToast(`"${currentRoomId}" ortak bahçesine bağlanıldı! 🌱`);
+        }
+
+        function copyRoomLink() {
+            const shareUrl = `${window.location.origin}${window.location.pathname}?bahce=${encodeURIComponent(currentRoomId)}`;
+            const tempInput = document.createElement('textarea');
+            tempInput.value = shareUrl;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast('Ortak bahçe davet linki kopyalandı! Zeynep’e WhatsApp’tan gönderebilirsin. 💌');
+        }
+
+        // --- 4. BİLDİRİM TOAST SİSTEMİ ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colors = type === 'success' 
+                ? 'bg-sage-800 text-white border-sage-600' 
+                : type === 'warning'
+                ? 'bg-terracotta-600 text-white border-terracotta-400'
+                : 'bg-white text-sage-900 border-sage-300';
+
+            toast.className = `pointer-events-auto px-4 py-3 rounded-2xl shadow-lg border text-xs sm:text-sm font-semibold flex items-center justify-between gap-3 animate-pop ${colors}`;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100">✕</button>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentElement) toast.remove();
+            }, 4000);
+        }
+
+        // --- 5. KULLANICI, AŞAMA VE VİDEO YARDIMCILARI ---
+        function switchUser(userKey) {
+            appState.activeUser = userKey;
+            selectedUnitFilter = 'Tümü';
+            saveState();
+            renderAll();
+        }
+
+        function switchStage(stageKey) {
+            const user = appState.users[appState.activeUser];
+            user.activeStage = stageKey;
+            selectedUnitFilter = 'Tümü';
+            saveState();
+            renderAll();
+        }
+
+        function isCamp15Active() {
+            const user = appState.users[appState.activeUser];
+            return appState.activeUser === 'nisa' && user.activeStage === 'camp15';
+        }
+
+        function getActiveList() {
+            const user = appState.users[appState.activeUser];
+            if (isCamp15Active()) {
+                return user.camp15;
+            }
+            return user.main175;
+        }
+
+        function getActivePlaylistUrl() {
+            return isCamp15Active() ? PLAYLIST_CAMP_15 : PLAYLIST_MAIN_175;
+        }
+
+        function getYouTubeTopicSearchUrl(topic) {
+            if (isCamp15Active()) {
+                return `https://www.youtube.com/results?search_query=${encodeURIComponent('Gerçel Matematik 15 Günde Sıfır Matematik ' + topic)}`;
+            }
+            return `https://www.youtube.com/results?search_query=${encodeURIComponent('DGS Matematik ' + topic)}`;
+        }
+
+        function getUnitBadgeStyle(unit) {
+            switch (unit) {
+                case 'Sayılar': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                case 'İşlem Yetenek': return 'bg-sky-100 text-sky-800 border-sky-200';
+                case 'Problemler': return 'bg-amber-100 text-amber-800 border-amber-200';
+                case 'Sayısal Yetenek': return 'bg-purple-100 text-purple-800 border-purple-200';
+                case 'Sayısal Mantık & Geometri': return 'bg-rose-100 text-rose-800 border-rose-200';
+                default: return 'bg-sage-100 text-sage-800 border-sage-200';
+            }
+        }
+
+        // --- 6. BUGÜNÜN ODAK KARTI & ORTAK BAHÇE BANNER'I ---
+        function getPlantStageSummary(userKey) {
+            const user = appState.users[userKey];
+            const completed = userKey === 'nisa'
+                ? user.camp15.filter(d => d.completed).length + user.main175.filter(d => d.completed).length
+                : user.main175.filter(d => d.completed).length;
+
+            if (completed === 0) return { icon: '🌰', label: 'Tohum', completed };
+            if (completed < 5) return { icon: '🌱', label: 'Filiz', completed };
+            if (completed < 15) return { icon: '🌿', label: 'Fide', completed };
+            if (completed < 35) return { icon: '🌷', label: 'Genç Bitki', completed };
+            if (completed < 75) return { icon: '🌸', label: 'Çiçekli Bitki', completed };
+            return { icon: '🌳', label: 'Meyve Ağacı', completed };
+        }
+
+        function renderSharedGardenBanner() {
+            const nisaSummary = getPlantStageSummary('nisa');
+            const zeynepSummary = getPlantStageSummary('zeynep');
+
+            document.getElementById('banner-nisa-icon').textContent = nisaSummary.icon;
+            document.getElementById('banner-nisa-stage').textContent = `${nisaSummary.label} • ${nisaSummary.completed} Gün`;
+
+            document.getElementById('banner-zeynep-icon').textContent = zeynepSummary.icon;
+            document.getElementById('banner-zeynep-stage').textContent = `${zeynepSummary.label} • ${zeynepSummary.completed} Gün`;
+        }
+
+        function renderTodayFocusCard() {
+            const container = document.getElementById('today-focus-card');
+            const user = appState.users[appState.activeUser];
+            const list = getActiveList();
+            const nextDay = list.find(d => !d.completed);
+            const playlistUrl = getActivePlaylistUrl();
+            const programLabel = isCamp15Active() ? '15 Günlük Temel Kamp (29 Gün)' : '175 Günlük DGS Takvimi';
+
+            if (!nextDay) {
+                container.innerHTML = `
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 mb-2">
+                                🎉 Tebrikler ${user.name}!
+                            </span>
+                            <h3 class="font-display font-extrabold text-xl text-sage-900">${programLabel} Tamamlandı!</h3>
+                            <p class="text-xs sm:text-sm text-sage-600 mt-1">Bu programdaki tüm günleri başarıyla bitirdin. Bahçen seninle gurur duyuyor!</p>
+                        </div>
+                        ${isCamp15Active() ? `
+                            <button onclick="switchStage('main175')" class="px-5 py-3 rounded-2xl bg-sage-600 hover:bg-sage-700 text-white font-bold text-xs sm:text-sm transition shrink-0">
+                                175 Günlük Programa Geç →
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            const searchUrl = getYouTubeTopicSearchUrl(nextDay.topic);
+            const directVideoUrl = nextDay.link && nextDay.link.trim() ? nextDay.link.trim() : '';
+            const unitBadgeClass = getUnitBadgeStyle(nextDay.unit);
+
+            container.innerHTML = `
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div class="space-y-2">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-sage-700 text-white">
+                                🎯 BUGÜNÜN HEDEFİ • ${nextDay.day}. GÜN
+                            </span>
+                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold border ${unitBadgeClass}">
+                                ${escapeHTML(nextDay.unit || 'Program')}
+                            </span>
+                            <span class="text-xs text-sage-500 font-semibold">${programLabel}</span>
+                        </div>
+                        <h3 class="font-display font-extrabold text-xl sm:text-2xl text-sage-900">
+                            ${escapeHTML(nextDay.topic)}
+                        </h3>
+                        <p class="text-xs text-sage-600">
+                            ${directVideoUrl ? 'Bu güne özel video linki kayıtlı. Hemen izleyip dersini tamamlayabilirsin!' : 'Aşağıdan oynatma listesini açabilir veya bugünün konusunu doğrudan YouTube’da bulabilirsin.'}
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-stretch sm:items-center gap-2 shrink-0">
+                        ${directVideoUrl ? `
+                            <a href="${escapeHTML(directVideoUrl)}" target="_blank" rel="noopener" class="px-4 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-extrabold flex items-center justify-center gap-2 shadow-sm transition">
+                                <i data-lucide="play-circle" class="w-4 h-4"></i>
+                                <span>Kayıtlı Videoyu İzle</span>
+                            </a>
+                        ` : ''}
+                        <a href="${playlistUrl}" target="_blank" rel="noopener" class="px-4 py-3 rounded-2xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-extrabold flex items-center justify-center gap-2 transition">
+                            <i data-lucide="list-video" class="w-4 h-4 text-red-600"></i>
+                            <span>Oynatma Listesini Aç</span>
+                        </a>
+                        <a href="${searchUrl}" target="_blank" rel="noopener" class="px-4 py-3 rounded-2xl bg-sage-100 hover:bg-sage-200 text-sage-800 text-xs font-extrabold flex items-center justify-center gap-2 transition">
+                            <i data-lucide="search" class="w-4 h-4 text-sage-700"></i>
+                            <span>Konuyu YouTube'da Bul</span>
+                        </a>
+                        <button onclick="openEditDayModal('${nextDay.id}')" class="px-3.5 py-3 rounded-2xl bg-cream-200 hover:bg-cream-300 text-sage-800 text-xs font-bold flex items-center justify-center gap-1.5 transition" title="Bu güne özel video linki yapıştır">
+                            <i data-lucide="link" class="w-4 h-4"></i>
+                            <span>Link Kaydet</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 7. DİJİTAL BİTKİ BÜYÜTME MOTORU (SVG) ---
+        function renderPlantGarden() {
+            const userKey = appState.activeUser;
+            const user = appState.users[userKey];
+            
+            let completedCount = 0;
+            let totalCount = 0;
+
+            if (userKey === 'nisa') {
+                const c15Done = user.camp15.filter(d => d.completed).length;
+                const m175Done = user.main175.filter(d => d.completed).length;
+                completedCount = c15Done + m175Done;
+                totalCount = user.camp15.length + user.main175.length;
+            } else {
+                completedCount = user.main175.filter(d => d.completed).length;
+                totalCount = user.main175.length;
+            }
+
+            const percent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+            document.getElementById('garden-greeting').textContent = `${user.name}'nın Matematik Bahçesi`;
+            document.getElementById('streak-count').textContent = user.streak;
+            document.getElementById('progress-numbers').textContent = `${completedCount} / ${totalCount} Gün (%${percent})`;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+
+            let stageInfo = {};
+            if (completedCount === 0) {
+                stageInfo = { badge: '🌰 Aşama 1: Tohum', next: 'İlk dersini tamamlayıp tohumu filizlendir!', level: 1 };
+            } else if (completedCount < 5) {
+                stageInfo = { badge: '🌱 Aşama 2: Filiz', next: `${5 - completedCount} gün sonra yapraklı fideye dönüşecek!`, level: 2 };
+            } else if (completedCount < 15) {
+                stageInfo = { badge: '🌿 Aşama 3: Fide', next: `${15 - completedCount} gün sonra genç bitkiye dönüşecek!`, level: 3 };
+            } else if (completedCount < 35) {
+                stageInfo = { badge: '🌷 Aşama 4: Genç Bitki', next: `${35 - completedCount} gün sonra çiçek açacak!`, level: 4 };
+            } else if (completedCount < 75) {
+                stageInfo = { badge: '🌸 Aşama 5: Çiçekli Bitki', next: `${75 - completedCount} gün sonra meyve ağacına dönüşecek!`, level: 5 };
+            } else {
+                stageInfo = { badge: '🌳 Aşama 6: Meyve Ağacı', next: 'Harikasın! Bahçen meyve veriyor, büyütmeye devam et!', level: 6 };
+            }
+
+            document.getElementById('plant-stage-badge').textContent = stageInfo.badge;
+            document.getElementById('next-stage-hint').textContent = stageInfo.next;
+
+            const layer = document.getElementById('plant-growth-layer');
+            if (stageInfo.level === 1) {
+                layer.innerHTML = `
+                    <ellipse cx="100" cy="129" rx="9" ry="6" fill="#8D6E63"/>
+                    <path d="M100 126C100 120 104 117 107 118" stroke="#749A83" stroke-width="3" stroke-linecap="round"/>
+                `;
+            } else if (stageInfo.level === 2) {
+                layer.innerHTML = `
+                    <path d="M100 132V102" stroke="#537D65" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M100 112C88 112 82 102 86 96C92 96 100 104 100 112Z" fill="#749A83"/>
+                    <path d="M100 105C112 105 118 95 114 89C108 89 100 97 100 105Z" fill="#9EBAA9"/>
+                `;
+            } else if (stageInfo.level === 3) {
+                layer.innerHTML = `
+                    <path d="M100 132V78" stroke="#416450" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M100 116C82 116 74 104 80 96C88 96 100 106 100 116Z" fill="#537D65"/>
+                    <path d="M100 106C118 106 126 94 120 86C112 86 100 96 100 106Z" fill="#749A83"/>
+                    <path d="M100 92C84 92 78 80 84 72C92 72 100 82 100 92Z" fill="#749A83"/>
+                    <path d="M100 80C100 66 112 62 116 68C116 76 108 80 100 80Z" fill="#9EBAA9"/>
+                `;
+            } else if (stageInfo.level === 4) {
+                layer.innerHTML = `
+                    <path d="M100 132V64" stroke="#355041" stroke-width="6" stroke-linecap="round"/>
+                    <path d="M100 116C78 116 70 102 78 92C88 92 100 104 100 116Z" fill="#537D65"/>
+                    <path d="M100 106C122 106 130 92 122 82C112 82 100 94 100 106Z" fill="#537D65"/>
+                    <path d="M100 88C80 88 74 74 82 64C90 64 100 76 100 88Z" fill="#749A83"/>
+                    <path d="M100 82C118 82 124 68 116 60C108 60 100 70 100 82Z" fill="#749A83"/>
+                    <circle cx="100" cy="58" r="9" fill="#F4A261"/>
+                    <circle cx="78" cy="66" r="6" fill="#E08E79"/>
+                    <circle cx="120" cy="62" r="6" fill="#E08E79"/>
+                `;
+            } else if (stageInfo.level === 5) {
+                layer.innerHTML = `
+                    <path d="M100 132V58" stroke="#355041" stroke-width="6" stroke-linecap="round"/>
+                    <path d="M100 116C76 116 68 100 76 90C88 90 100 104 100 116Z" fill="#416450"/>
+                    <path d="M100 104C124 104 132 88 124 78C112 78 100 92 100 104Z" fill="#537D65"/>
+                    <path d="M100 86C78 86 72 70 80 60C90 60 100 74 100 86Z" fill="#749A83"/>
+                    <circle cx="100" cy="48" r="14" fill="#FBCFE8"/>
+                    <circle cx="100" cy="48" r="6" fill="#F59E0B"/>
+                    <circle cx="76" cy="62" r="10" fill="#FDE68A"/>
+                    <circle cx="76" cy="62" r="4" fill="#D1745D"/>
+                    <circle cx="122" cy="76" r="10" fill="#FBCFE8"/>
+                    <circle cx="122" cy="76" r="4" fill="#F59E0B"/>
+                `;
+            } else {
+                layer.innerHTML = `
+                    <path d="M100 132V65" stroke="#5C4033" stroke-width="10" stroke-linecap="round"/>
+                    <circle cx="100" cy="62" r="36" fill="#537D65"/>
+                    <circle cx="74" cy="74" r="26" fill="#416450"/>
+                    <circle cx="126" cy="74" r="26" fill="#749A83"/>
+                    <circle cx="100" cy="44" r="26" fill="#749A83"/>
+                    <circle cx="84" cy="68" r="5" fill="#E08E79"/>
+                    <circle cx="116" cy="64" r="5" fill="#E08E79"/>
+                    <circle cx="100" cy="48" r="5" fill="#F59E0B"/>
+                    <circle cx="96" cy="80" r="5" fill="#E08E79"/>
+                `;
+            }
+        }
+
+        function waterPlantToday() {
+            const list = getActiveList();
+            const nextPending = list.find(d => !d.completed);
+
+            if (nextPending) {
+                nextPending.completed = true;
+                showToast(`Harika! ${nextPending.day}. Gün (${nextPending.topic}) tamamlandı ve bitkine su verildi! 💧🌱`);
+            } else {
+                showToast(`Bitkine ekstra sevgi ve su verdin! 💧✨`);
+            }
+
+            incrementStreakIfEligible();
+            triggerWaterAnimation();
+            saveState();
+            renderAll();
+        }
+
+        function triggerWaterAnimation() {
+            const drops = document.getElementById('water-drops-svg');
+            drops.classList.remove('hidden');
+            const clone = drops.cloneNode(true);
+            drops.parentNode.replaceChild(clone, drops);
+            setTimeout(() => {
+                const el = document.getElementById('water-drops-svg');
+                if (el) el.classList.add('hidden');
+            }, 1300);
+        }
+
+        function incrementStreakIfEligible() {
+            const user = appState.users[appState.activeUser];
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (user.lastWateredDate !== todayStr) {
+                user.streak += 1;
+                user.lastWateredDate = todayStr;
+            }
+        }
+
+        function shareWhatsAppProgress() {
+            const user = appState.users[appState.activeUser];
+            const summary = getPlantStageSummary(appState.activeUser);
+            const list = getActiveList();
+            const lastCompleted = [...list].reverse().find(d => d.completed);
+            const topicText = lastCompleted ? `${lastCompleted.day}. Gün (${lastCompleted.topic})` : 'bugünkü dersimi';
+            const msg = `Selam! 🌱 Matematik Bahçesi'nde ${topicText} bitirdim ve bitkimi suladım! Bitkim şu an "${summary.label}" aşamasında (${summary.completed} gün tamamlandı, ${user.streak} gün seri 🔥). Sıra sende!`;
+            const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+            window.open(waUrl, '_blank', 'noopener');
+        }
+
+        // --- 8. KULLANICIYA ÖZEL BAĞLAM KARTI (Nisa vs Zeynep) ---
+        function renderUserContextCard() {
+            const container = document.getElementById('user-context-card');
+            const userKey = appState.activeUser;
+            const user = appState.users[userKey];
+
+            if (userKey === 'nisa') {
+                const campDone = user.camp15.filter(d => d.completed).length;
+                const totalCamp = user.camp15.length;
+                const isCampFinished = campDone === totalCamp;
+                container.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-extrabold text-sage-700 uppercase tracking-wider">🌸 Hayrun Nisa'nın Rotası</span>
+                        <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-sage-100 text-sage-800">${campDone}/${totalCamp} Gün Kamp</span>
+                    </div>
+                    <p class="text-xs text-sage-600 leading-relaxed mb-3">
+                        ${isCampFinished 
+                            ? 'Tebrikler! 29 günlük temel kampı bitirdin. Artık Zeynep ile aynı 175 günlük DGS takvimine hazırsın!' 
+                            : 'Önce 15 günlük temel kampın (29 gün) konularını tamamlayıp ardından Zeynep ile 175 günlük DGS takvimine geçeceksin.'}
+                    </p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="switchStage('camp15')" class="py-2 px-3 rounded-xl text-xs font-bold border transition ${user.activeStage === 'camp15' ? 'bg-sage-600 text-white border-sage-600' : 'bg-sage-50 text-sage-700 border-sage-200'}">
+                            1. Aşama: Temel Kamp
+                        </button>
+                        <button onclick="switchStage('main175')" class="py-2 px-3 rounded-xl text-xs font-bold border transition ${user.activeStage === 'main175' ? 'bg-sage-600 text-white border-sage-600' : 'bg-sage-50 text-sage-700 border-sage-200'}">
+                            2. Aşama: 175 Gün DGS
+                        </button>
+                    </div>
+                `;
+            } else {
+                const currentDay = user.currentDayOffset || 16;
+                container.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-extrabold text-sage-700 uppercase tracking-wider">🌿 Zeynep'in Hızlı Gün Ayarı</span>
+                        <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-cream-200 text-sage-800">175 Günlük DGS</span>
+                    </div>
+                    <p class="text-xs text-sage-600 leading-relaxed mb-3">
+                        175 günlük DGS takviminde şu an kaçıncı günde olduğunu seç; önceki günler otomatik tamamlandı işaretlensin:
+                    </p>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="zeynep-day-setter" value="${currentDay}" min="1" max="175" class="w-20 px-3 py-2 rounded-xl bg-sage-50 border border-sage-200 text-sm font-extrabold text-sage-900 text-center">
+                        <button onclick="applyZeynepCurrentDay()" class="flex-1 py-2 px-3 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-xs font-bold transition">
+                            Şu An Bu Gündeyim
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function applyZeynepCurrentDay() {
+            const input = document.getElementById('zeynep-day-setter');
+            const targetDay = parseInt(input.value, 10);
+            if (isNaN(targetDay) || targetDay < 1 || targetDay > 175) {
+                showToast('Lütfen 1 ile 175 arasında bir gün numarası girin.', 'warning');
+                return;
+            }
+
+            const zeynep = appState.users.zeynep;
+            zeynep.currentDayOffset = targetDay;
+
+            zeynep.main175.forEach(item => {
+                item.completed = item.day < targetDay;
+            });
+
+            saveState();
+            renderAll();
+            showToast(`Zeynep'in programı ${targetDay}. güne ayarlandı! Önceki ${targetDay - 1} gün tamamlandı işaretlendi. 🌿`);
+        }
+
+        // --- 9. PROGRAM SEKMELERİ, ÜNİTE FİLTRELERİ VE TABLO RENDER ---
+        function renderProgramTabs() {
+            const container = document.getElementById('program-tabs-container');
+            const playlistBtn = document.getElementById('active-playlist-btn');
+            const unitBar = document.getElementById('unit-filter-bar');
+            const userKey = appState.activeUser;
+            const user = appState.users[userKey];
+
+            playlistBtn.href = getActivePlaylistUrl();
+
+            if (userKey === 'nisa') {
+                container.innerHTML = `
+                    <button onclick="switchStage('camp15')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 ${user.activeStage === 'camp15' ? 'bg-sage-600 text-white shadow-xs' : 'bg-sage-50 text-sage-700 hover:bg-sage-100'}">
+                        <span>🌱 15 Günlük Temel Kamp (29 Gün)</span>
+                    </button>
+                    <button onclick="switchStage('main175')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 ${user.activeStage === 'main175' ? 'bg-sage-600 text-white shadow-xs' : 'bg-sage-50 text-sage-700 hover:bg-sage-100'}">
+                        <span>🌳 175 Günlük DGS Takvimi</span>
+                    </button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-sage-600 text-white flex items-center gap-1.5">
+                        <span>🌳 Zeynep: 175 Günlük DGS Takvimi</span>
+                    </div>
+                `;
+            }
+
+            // Ünite filtre haplarını sadece 175 Günlük DGS Takvimi aktifken göster
+            if (!isCamp15Active()) {
+                const units = ['Tümü', 'Sayılar', 'İşlem Yetenek', 'Problemler', 'Sayısal Yetenek', 'Sayısal Mantık & Geometri'];
+                unitBar.classList.remove('hidden');
+                unitBar.innerHTML = units.map(u => {
+                    const active = selectedUnitFilter === u;
+                    return `
+                        <button onclick="setUnitFilter('${u}')" class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition border ${active ? 'bg-sage-800 text-white border-sage-800' : 'bg-sage-50 text-sage-700 border-sage-200 hover:bg-sage-100'}">
+                            ${u}
+                        </button>
+                    `;
+                }).join('');
+            } else {
+                unitBar.classList.add('hidden');
+            }
+        }
+
+        function setUnitFilter(unitName) {
+            selectedUnitFilter = unitName;
+            renderProgramTabs();
+            renderSchedule();
+        }
+
+        function renderSchedule() {
+            const tbody = document.getElementById('schedule-tbody');
+            const emptyState = document.getElementById('empty-state');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            const statusFilter = document.getElementById('filter-status').value;
+
+            const list = getActiveList();
+            const playlistUrl = getActivePlaylistUrl();
+
+            const filtered = list.filter(item => {
+                const unitStr = (item.unit || '').toLowerCase();
+                const matchesUnit = isCamp15Active() || selectedUnitFilter === 'Tümü' || item.unit === selectedUnitFilter;
+                const matchesSearch = item.topic.toLowerCase().includes(searchTerm) || 
+                                      unitStr.includes(searchTerm) ||
+                                      `${item.day}. gün`.includes(searchTerm) ||
+                                      String(item.day) === searchTerm;
+                const matchesStatus = statusFilter === 'all' 
+                    ? true 
+                    : statusFilter === 'completed' ? item.completed : !item.completed;
+                return matchesUnit && matchesSearch && matchesStatus;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            tbody.innerHTML = filtered.map(item => {
+                const hasCustomLink = item.link && item.link.trim().length > 0;
+                const primaryVideoUrl = hasCustomLink ? item.link.trim() : playlistUrl;
+                const searchTopicUrl = getYouTubeTopicSearchUrl(item.topic);
+                const rowBg = item.completed ? 'bg-sage-50/60' : 'hover:bg-cream-50';
+                const textStyle = item.completed ? 'line-through text-sage-400' : 'text-sage-900 font-bold';
+                const unitBadgeClass = getUnitBadgeStyle(item.unit);
+
+                return `
+                    <tr class="transition ${rowBg}">
+                        <td class="py-3 px-2 text-center">
+                            <button onclick="toggleDayComplete('${item.id}')" class="w-6 h-6 rounded-lg border-2 flex items-center justify-center mx-auto transition ${item.completed ? 'bg-sage-600 border-sage-600 text-white' : 'border-sage-300 hover:border-sage-500 bg-white'}">
+                                ${item.completed ? '<i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>' : ''}
+                            </button>
+                        </td>
+                        <td class="py-3 px-2 font-display font-bold text-xs text-sage-700 whitespace-nowrap">
+                            ${item.day}. Gün
+                        </td>
+                        <td class="py-3 px-2">
+                            <div class="flex flex-wrap items-center gap-1.5 mb-0.5">
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold border ${unitBadgeClass}">
+                                    ${escapeHTML(item.unit || 'Kamp')}
+                                </span>
+                            </div>
+                            <div class="${textStyle} text-xs sm:text-sm">${escapeHTML(item.topic)}</div>
+                            ${item.note ? `<div class="text-[11px] text-sage-500 md:hidden mt-0.5">📝 ${escapeHTML(item.note)}</div>` : ''}
+                        </td>
+                        <td class="py-3 px-2">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <a href="${escapeHTML(primaryVideoUrl)}" target="_blank" rel="noopener" class="px-2.5 py-1.5 rounded-lg ${hasCustomLink ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-red-50 hover:bg-red-100 text-red-700 border border-red-200'} text-xs font-bold inline-flex items-center gap-1 transition" title="${hasCustomLink ? 'Kayıtlı videoyu aç' : 'Kamp oynatma listesini aç'}">
+                                    <i data-lucide="play-circle" class="w-3.5 h-3.5"></i>
+                                    <span>${hasCustomLink ? 'Videoyu İzle' : 'Oynatma Listesi'}</span>
+                                </a>
+                                <a href="${searchTopicUrl}" target="_blank" rel="noopener" class="p-1.5 rounded-lg bg-sage-100 hover:bg-sage-200 text-sage-700 transition" title="Bu konuyu YouTube'da ara">
+                                    <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
+                        </td>
+                        <td class="py-3 px-2 hidden md:table-cell text-xs text-sage-600">
+                            ${item.note ? escapeHTML(item.note) : '<span class="text-sage-300">—</span>'}
+                        </td>
+                        <td class="py-3 px-2 text-right">
+                            <button onclick="openEditDayModal('${item.id}')" class="p-1.5 rounded-lg hover:bg-sage-200/70 text-sage-600 transition" title="Video Linki / Not Düzenle">
+                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function toggleDayComplete(dayId) {
+            const list = getActiveList();
+            const item = list.find(d => d.id === dayId);
+            if (!item) return;
+
+            item.completed = !item.completed;
+            if (item.completed) {
+                incrementStreakIfEligible();
+                triggerWaterAnimation();
+                showToast(`${item.day}. Gün (${item.topic}) tamamlandı! Bitkin büyümeye devam ediyor 🌱`);
+            }
+
+            saveState();
+            renderAll();
+        }
+
+        function addNewDayRow() {
+            const list = getActiveList();
+            const nextDay = list.length > 0 ? Math.max(...list.map(d => d.day)) + 1 : 1;
+            const newId = `custom_${Date.now()}`;
+            list.push({
+                id: newId,
+                day: nextDay,
+                unit: isCamp15Active() ? 'Temel Kamp' : 'Ek Çalışma',
+                topic: `${nextDay}. Gün Yeni Konu`,
+                link: '',
+                note: '',
+                completed: false
+            });
+            saveState();
+            renderAll();
+            openEditDayModal(newId);
+        }
+
+        // --- 10. GÜN DÜZENLEME MODALI ---
+        function openEditDayModal(dayId) {
+            const list = getActiveList();
+            const item = list.find(d => d.id === dayId);
+            if (!item) return;
+
+            document.getElementById('edit-day-id').value = item.id;
+            document.getElementById('edit-modal-title').textContent = `${item.day}. Gün Ders Detayları`;
+            document.getElementById('edit-unit-input').value = item.unit || '';
+            document.getElementById('edit-topic-input').value = item.topic;
+            document.getElementById('edit-link-input').value = item.link || '';
+            document.getElementById('edit-note-input').value = item.note || '';
+
+            openModal('edit-day-modal');
+        }
+
+        function saveDayDetails() {
+            const id = document.getElementById('edit-day-id').value;
+            const unit = document.getElementById('edit-unit-input').value.trim();
+            const topic = document.getElementById('edit-topic-input').value.trim();
+            const link = document.getElementById('edit-link-input').value.trim();
+            const note = document.getElementById('edit-note-input').value.trim();
+
+            if (!topic) {
+                showToast('Konu adı boş bırakılamaz.', 'warning');
+                return;
+            }
+
+            const list = getActiveList();
+            const item = list.find(d => d.id === id);
+            if (item) {
+                item.unit = unit || item.unit;
+                item.topic = topic;
+                item.link = link;
+                item.note = note;
+            }
+
+            saveState();
+            renderAll();
+            closeModal('edit-day-modal');
+            showToast('Ders bilgileri güncellendi! ✅');
+        }
+
+        // --- 10. TOPLU EXCEL / KONU & LİNK YAPIŞTIRMA ---
+        function processBulkPaste() {
+            const text = document.getElementById('bulk-textarea').value.trim();
+            const startDay = parseInt(document.getElementById('bulk-start-day').value, 10) || 1;
+
+            if (!text) {
+                showToast('Lütfen yapıştırılacak satırları girin.', 'warning');
+                return;
+            }
+
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const list = getActiveList();
+
+            lines.forEach((line, idx) => {
+                const targetDayNum = startDay + idx;
+                // Ayırıcı olarak | veya tab (Excel kopyası) destekle
+                let parts = line.includes('|') ? line.split('|') : line.split('\t');
+                let topicPart = parts[0].trim();
+                // Başta "1. Gün" veya "16." gibi ifade varsa temizle
+                topicPart = topicPart.replace(/^\d+[\.\-\)]\s*(gün)?\s*/i, '').trim() || parts[0].trim();
+                let linkPart = parts[1] ? parts[1].trim() : '';
+
+                let existing = list.find(d => d.day === targetDayNum);
+                if (existing) {
+                    existing.topic = topicPart;
+                    if (linkPart) existing.link = linkPart;
+                } else {
+                    list.push({
+                        id: `bulk_${targetDayNum}_${Date.now()}`,
+                        day: targetDayNum,
+                        topic: topicPart,
+                        link: linkPart,
+                        note: '',
+                        completed: false
+                    });
+                }
+            });
+
+            list.sort((a, b) => a.day - b.day);
+            saveState();
+            renderAll();
+            document.getElementById('bulk-textarea').value = '';
+            closeModal('bulk-paste-modal');
+            showToast(`${lines.length} gün başarıyla programa aktarıldı! 📋`);
+        }
+
+        function pasteOnlyLinksMode() {
+            const text = document.getElementById('bulk-textarea').value.trim();
+            const startDay = parseInt(document.getElementById('bulk-start-day').value, 10) || 1;
+            if (!text) {
+                showToast('Lütfen alt alta YouTube linklerini yapıştırın.', 'warning');
+                return;
+            }
+            const links = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const list = getActiveList();
+
+            links.forEach((url, idx) => {
+                const targetDayNum = startDay + idx;
+                const existing = list.find(d => d.day === targetDayNum);
+                if (existing) {
+                    existing.link = url;
+                }
+            });
+
+            saveState();
+            renderSchedule();
+            document.getElementById('bulk-textarea').value = '';
+            closeModal('bulk-paste-modal');
+            showToast(`${links.length} adet video linki ilgili günlere eklendi! 🎬`);
+        }
+
+        // --- 11. PAYLAŞIM & YEDEKLEME (Nisa <-> Zeynep) ---
+        function downloadJSONBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `matematik_bahcesi_yedek_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast('Yedek dosyası indirildi! 💾');
+        }
+
+        // --- 12. İRADE ACİL DURUM SAYACI (5 DAKİKA KURALI) ---
+        let willpowerSeconds = 300;
+        let willpowerInterval = null;
+        let quoteIndex = 0;
+
+        function openWillpowerModal() {
+            resetWillpowerTimer();
+            openModal('willpower-modal');
+        }
+
+        function closeWillpowerModal() {
+            clearInterval(willpowerInterval);
+            willpowerInterval = null;
+            closeModal('willpower-modal');
+        }
+
+        function resetWillpowerTimer() {
+            clearInterval(willpowerInterval);
+            willpowerInterval = null;
+            willpowerSeconds = 300;
+            updateTimerDisplay();
+            document.getElementById('timer-toggle-btn').textContent = 'Sayacı Başlat';
+        }
+
+        function toggleWillpowerTimer() {
+            const btn = document.getElementById('timer-toggle-btn');
+            if (willpowerInterval) {
+                clearInterval(willpowerInterval);
+                willpowerInterval = null;
+                btn.textContent = 'Devam Et';
+            } else {
+                btn.textContent = 'Duraklat';
+                willpowerInterval = setInterval(() => {
+                    willpowerSeconds--;
+                    updateTimerDisplay();
+                    if (willpowerSeconds <= 0) {
+                        clearInterval(willpowerInterval);
+                        willpowerInterval = null;
+                        btn.textContent = 'Tamamlandı! 🎉';
+                        showToast('5 dakikayı başardın! İraden galip geldi, şimdi dersi akışına bırak! 🔥');
+                    }
+                }, 1000);
+            }
+        }
+
+        function updateTimerDisplay() {
+            const mins = String(Math.floor(willpowerSeconds / 60)).padStart(2, '0');
+            const secs = String(willpowerSeconds % 60).padStart(2, '0');
+            document.getElementById('timer-display').textContent = `${mins}:${secs}`;
+        }
+
+        function nextMotivationQuote() {
+            quoteIndex = (quoteIndex + 1) % MOTIVATION_QUOTES.length;
+            document.getElementById('motivation-quote').textContent = `"${MOTIVATION_QUOTES[quoteIndex]}"`;
+        }
+
+        // --- 13. GÜNLÜK BİLDİRİM & TAKVİM ENTEGRASYONU ---
+        function enableBrowserNotification() {
+            const timeVal = document.getElementById('reminder-time-input').value;
+            appState.reminderTime = timeVal;
+            appState.reminderEnabled = true;
+            saveState();
+            updateGoogleCalendarLink();
+
+            if (!("Notification" in window)) {
+                showToast('Tarayıcınız bildirimleri desteklemiyor, alttaki Takvim Alarmını kullanabilirsiniz.', 'warning');
+                return;
+            }
+
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    new Notification("Matematik Bahçesi 🌱", {
+                        body: `Harika! Her gün saat ${timeVal} için hatırlatıcı kuruldu. Bitkini sulamayı unutma!`
+                    });
+                    document.getElementById('reminder-badge').classList.remove('hidden');
+                    showToast(`Bildirimler açıldı! Saat ${timeVal} olduğunda hatırlatacağız. 🔔`);
+                } else {
+                    showToast('Bildirim izni verilmedi. Telefon ayarlarından izin verebilir veya Takvim butonunu kullanabilirsiniz.', 'warning');
+                }
+            });
+        }
+
+        function updateGoogleCalendarLink() {
+            const timeVal = document.getElementById('reminder-time-input').value || '18:00';
+            const [hh, mm] = timeVal.split(':');
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mo = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            
+            const startStr = `${yyyy}${mo}${dd}T${hh}${mm}00`;
+            const endHour = String((parseInt(hh, 10) + 1) % 24).padStart(2, '0');
+            const endStr = `${yyyy}${mo}${dd}T${endHour}${mm}00`;
+
+            const title = encodeURIComponent("Matematik Bahçesi: Günlük Ders & Bitki Sulama Vakti 🌱");
+            const details = encodeURIComponent("Hayrun Nisa & Zeynep Matematik Kampı! Bugünkü videonu izle, soruları çöz ve bitkini sula.");
+            const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}&recur=RRULE:FREQ=DAILY`;
+            
+            document.getElementById('gcal-reminder-link').href = url;
+        }
+
+        function downloadICSAlarm() {
+            const timeVal = document.getElementById('reminder-time-input').value || '18:00';
+            const [hh, mm] = timeVal.split(':');
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mo = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+
+            const icsContent = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Matematik Bahcesi//Nisa & Zeynep//TR',
+                'BEGIN:VEVENT',
+                `DTSTART:${yyyy}${mo}${dd}T${hh}${mm}00`,
+                `DTEND:${yyyy}${mo}${dd}T${String((parseInt(hh, 10) + 1) % 24).padStart(2, '0')}${mm}00`,
+                'RRULE:FREQ=DAILY',
+                'SUMMARY:Matematik Bahçesi: Günlük Ders & Bitki Sulama 🌱',
+                'DESCRIPTION:Hayrun Nisa & Zeynep Matematik Kampı! Bugünkü videonu izle ve bitkini sula.',
+                'BEGIN:VALARM',
+                'TRIGGER:-PT0M',
+                'ACTION:DISPLAY',
+                'DESCRIPTION:Matematik Bahçesi Çalışma Vakti!',
+                'END:VALARM',
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\r\n');
+
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'matematik_bahcesi_gunluk_alarm.ics';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            showToast('Takvim alarmı (.ics) indirildi! Açarak telefon takvimine ekleyebilirsin. 📅');
+        }
+
+        // Uygulama açıkken saat kontrolü (her 30 saniyede bir)
+        setInterval(() => {
+            if (!appState.reminderEnabled) return;
+            const now = new Date();
+            const currentHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            const todayStr = now.toISOString().split('T')[0];
+
+            if (currentHHMM === appState.reminderTime && appState.lastNotifiedDate !== todayStr) {
+                appState.lastNotifiedDate = todayStr;
+                saveState();
+                if ("Notification" in window && Notification.permission === "granted") {
+                    new Notification("Matematik Bahçesi 🌱", {
+                        body: "Ders çalışma saatin geldi! Bugünkü videonu izleyip bitkini sulamaya ne dersin?"
+                    });
+                }
+                showToast("🔔 Günlük Matematik Çalışma Saati Geldi! Bitkin seni bekliyor.");
+            }
+        }, 30000);
+
+        // --- 14. DİNAMİK PWA MANIFEST & TELEFONA KURULUM ---
+        let deferredPrompt = null;
+
+        function setupDynamicPWA() {
+            // SVG ikonu Data URI olarak oluştur
+            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#416450"/><circle cx="256" cy="256" r="160" fill="#537D65"/><path d="M256 360V210" stroke="#FAF6F0" stroke-width="24" stroke-linecap="round"/><path d="M256 260C200 260 175 215 195 185C225 185 256 225 256 260Z" fill="#9EBAA9"/><path d="M256 225C312 225 337 180 317 150C287 150 256 190 256 225Z" fill="#FAF6F0"/></svg>`;
+            const iconUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgIcon);
+            document.getElementById('apple-touch-icon').href = iconUrl;
+
+            const manifest = {
+                name: "Matematik Bahçesi - Nisa & Zeynep",
+                short_name: "MatBahçesi",
+                start_url: window.location.href,
+                display: "standalone",
+                background_color: "#FAF6F0",
+                theme_color: "#416450",
+                icons: [
+                    { src: iconUrl, sizes: "192x192", type: "image/svg+xml" },
+                    { src: iconUrl, sizes: "512x512", type: "image/svg+xml" }
+                ]
+            };
+
+            const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+            document.getElementById('manifest-link').href = URL.createObjectURL(manifestBlob);
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                document.getElementById('native-install-trigger').classList.remove('hidden');
+            });
+        }
+
+        async function triggerNativePWAInstall() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                showToast('Matematik Bahçesi ana ekranınıza eklendi! 📲');
+            }
+            deferredPrompt = null;
+            closeModal('pwa-modal');
+        }
+
+        // --- 15. GENEL YARDIMCI FONKSİYONLAR ---
+        function openModal(id) {
+            const el = document.getElementById(id);
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+            if (id === 'reminder-modal') updateGoogleCalendarLink();
+        }
+
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+        }
+
+        function escapeHTML(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function updateHeaderBadges() {
+            const isNisa = appState.activeUser === 'nisa';
+            const tabNisa = document.getElementById('tab-nisa');
+            const tabZeynep = document.getElementById('tab-zeynep');
+
+            tabNisa.className = `py-2.5 px-4 rounded-xl font-display font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${isNisa ? 'bg-white text-sage-900 shadow-xs' : 'text-sage-600 hover:text-sage-900'}`;
+            tabZeynep.className = `py-2.5 px-4 rounded-xl font-display font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${!isNisa ? 'bg-white text-sage-900 shadow-xs' : 'text-sage-600 hover:text-sage-900'}`;
+
+            document.getElementById('nisa-streak-pill').textContent = `${appState.users.nisa.streak}🔥`;
+            document.getElementById('zeynep-streak-pill').textContent = `${appState.users.zeynep.streak}🔥`;
+        }
+
+        function renderAll() {
+            updateHeaderBadges();
+            renderSharedGardenBanner();
+            renderTodayFocusCard();
+            renderPlantGarden();
+            renderUserContextCard();
+            renderProgramTabs();
+            renderSchedule();
+            lucide.createIcons();
+        }
+
+        // --- UYGULAMA BAŞLATMA ---
+        window.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            setupDynamicPWA();
+            const roomInput = document.getElementById('garden-room-input');
+            if (roomInput) roomInput.value = currentRoomId;
+            document.getElementById('reminder-time-input').value = appState.reminderTime || '18:00';
+            if (appState.reminderEnabled) {
+                document.getElementById('reminder-badge').classList.remove('hidden');
+            }
+            renderAll();
+            if (window.initGardenCloudSync) {
+                window.initGardenCloudSync();
+            }
+        });
+    </script>
+
+    <!-- Canlı Bulut Senkronizasyonu Modülü (Firebase Firestore) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        let unsubscribeSnapshot = null;
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'matematik-bahcesi-app';
+
+        window.initGardenCloudSync = async function () {
+            try {
+                if (typeof __firebase_config === 'undefined') {
+                    updateSyncUI(false, 'Yerel Mod (GitHub Pages için hazır)');
+                    return;
+                }
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const cred = await signInWithCustomToken(auth, __initial_auth_token);
+                    currentUser = cred.user;
+                } else {
+                    const cred = await signInAnonymously(auth);
+                    currentUser = cred.user;
+                }
+
+                cloudSyncReady = true;
+                updateSyncUI(true, 'Canlı Bulut Senkronizasyonu Aktif');
+                window.subscribeGardenCloud(currentRoomId);
+            } catch (err) {
+                console.error("Bulut bağlantısı başlatılamadı:", err);
+                updateSyncUI(false, 'Çevrimdışı / Yerel Kayıt Aktif');
+            }
+        };
+
+        window.subscribeGardenCloud = function (roomId) {
+            if (!db || !currentUser) return;
+            if (unsubscribeSnapshot) {
+                unsubscribeSnapshot();
+            }
+
+            const gardenDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'shared_gardens', roomId);
+
+            unsubscribeSnapshot = onSnapshot(gardenDocRef, (snap) => {
+                if (snap.exists()) {
+                    const remoteData = snap.data();
+                    if (remoteData && remoteData.users) {
+                        isApplyingRemoteUpdate = true;
+                        appState.users = remoteData.users;
+                        if (remoteData.latestCheer && remoteData.latestCheer.id !== lastSeenCheerId) {
+                            lastSeenCheerId = remoteData.latestCheer.id;
+                            appState.latestCheer = remoteData.latestCheer;
+                            if (remoteData.latestCheer.from !== appState.users[appState.activeUser].name) {
+                                showToast(remoteData.latestCheer.message);
+                            }
+                        }
+                        saveState(false);
+                        renderAll();
+                        isApplyingRemoteUpdate = false;
+                        const timeEl = document.getElementById('last-sync-time');
+                        if (timeEl) {
+                            const now = new Date();
+                            timeEl.textContent = `Son eşleşme: ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                        }
+                    }
+                } else {
+                    window.pushGardenToCloud();
+                }
+            }, (error) => {
+                console.error("Canlı dinleme hatası:", error);
+            });
+        };
+
+        window.pushGardenToCloud = async function () {
+            if (!db || !currentUser || !cloudSyncReady) return;
+            try {
+                const gardenDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'shared_gardens', currentRoomId);
+                await setDoc(gardenDocRef, {
+                    users: appState.users,
+                    latestCheer: appState.latestCheer || null,
+                    updatedAt: Date.now()
+                }, { merge: true });
+            } catch (err) {
+                console.error("Buluta kaydetme hatası:", err);
+            }
+        };
+
+        function updateSyncUI(isOnline, labelText) {
+            const dot = document.getElementById('cloud-status-dot');
+            const label = document.getElementById('sync-connection-label');
+            if (dot) {
+                dot.className = isOnline
+                    ? 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse'
+                    : 'w-2 h-2 rounded-full bg-amber-500';
+            }
+            if (label) {
+                label.textContent = labelText;
+            }
+        }
+    </script>
+</body>
+</html>
